@@ -1,3 +1,9 @@
+## 0.0.7
+
+- Se agrega la abstracción ServiceSession para gestión de sesión/autenticación de usuario.
+- Implementación de FakeServiceSession usando BlocGeneral para simular login/logout y stream de usuario autenticado.
+- Tests unitarios completos para FakeServiceSession: stream reactivo, login simulado y signOut.
+
 ## 0.0.6
 
 - Implementación de FakeServiceWsDatabase en infraestructura, usando BlocGeneral de jocaagura_domain para simular streams y almacenamiento en memoria.
