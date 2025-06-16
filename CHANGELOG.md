@@ -1,3 +1,12 @@
+## 0.0.5
+
+- Refactor y robustecimiento de los modelos de dominio (CardModel, VoteModel, GameModel):
+  - Homogeneización y null-safety en serialización/deserialización.
+  - Corrección de la conversión de listas de historias (stories) en GameModel.
+  - Utilización de utilitarios genéricos para listas de modelos.
+- Tests unitarios completos para modelos y utilidades, cubriendo escenarios y estados posibles del juego.
+- Mejoras en la comparación de modelos en tests para evitar falsos negativos.
+
 ## 0.0.4
 
 - Corrección en la declaración de assets en pubspec.yaml para Flutter.
