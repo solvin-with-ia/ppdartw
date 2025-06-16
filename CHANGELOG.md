@@ -1,3 +1,10 @@
+## 0.0.3
+
+- Se agregó ProjectorWidget para diseño responsive.
+- Nuevo utilitario DeviceType y DeviceDesign en shared/device_utils.dart.
+- EnumViews creado para gestionar las vistas principales.
+- Nueva vista SplashView como pantalla de inicio, muestra el tipo de dispositivo proyectado.
+
 ## 0.0.2
 
 - Corrección de dependencias: se añadió correctamente flutter en pubspec.yaml.
