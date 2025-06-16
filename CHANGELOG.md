@@ -1,3 +1,8 @@
+## 0.0.6
+
+- Implementación de FakeServiceWsDatabase en infraestructura, usando BlocGeneral de jocaagura_domain para simular streams y almacenamiento en memoria.
+- Tests unitarios completos para FakeServiceWsDatabase: guardado, lectura, streams de documento y colección, y múltiples documentos.
+
 ## 0.0.5
 
 - Refactor y robustecimiento de los modelos de dominio (CardModel, VoteModel, GameModel):
