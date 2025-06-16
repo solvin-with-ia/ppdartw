@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'blocs/bloc_theme.dart';
 import 'shared/app_state_manager.dart';
+import 'views/splash_view.dart';
 
 void main() {
   final BlocTheme blocTheme = BlocTheme();
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const SplashView(),
     );
   }
 }
