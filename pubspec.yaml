@@ -3,7 +3,7 @@ description: |
   POC de Dart/Flutter que recrea un Planning Poker para demostrar el poder de la programación reactiva en Flutter usando Windsurf.
   El proyecto implementa arquitectura limpia y principios SOLID, empleando el patrón BLoC y dependencias provenientes del paquete jocaagura_domain.
   Flujo de datos: Services <-> Gateway (JSON) <-> Repository (Model) <-> Usecases <-> Bloc <-> UI <-> AppManager (Inyector de dependencias de nuestros BLoC) <-> Views/Pages <-> Widgets.
-version: 0.0.3
+version: 0.0.4
 # repository: https://github.com/my_org/my_repo
 
 environment:
@@ -17,9 +17,14 @@ dependencies:
   flutter:
     sdk: flutter
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   lints: ^6.0.0
   test: ^1.24.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo_w.png
+    - assets/logotipo_w.png

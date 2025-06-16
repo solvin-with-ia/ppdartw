@@ -1,3 +1,8 @@
+## 0.0.4
+
+- Corrección en la declaración de assets en pubspec.yaml para Flutter.
+- El tema morado personalizado ahora se aplica correctamente en toda la app.
+
 ## 0.0.3
 
 - Se agregó ProjectorWidget para diseño responsive.
