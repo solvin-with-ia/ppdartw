@@ -1,0 +1,29 @@
+
+
+lib
+├── 📁 infrastructure              # 🔌 CAPA DE INFRAESTRUCTURA
+│   ├── 📁 services                # Implementaciones que acceden a Firebase, HTTP, etc.
+│   │   └── theme_remote_service.dart
+│   ├── 📁 gateways                # Adaptadores para datos externos
+│   │   └── theme_gateway_impl.dart
+├── 📁 domain                      # 📌 CAPA DE DOMINIO
+│   ├── 📁 entities                # Entidades puras, sin dependencias externas
+│   │   └── theme_entity.dart
+│   ├── 📁 repositories            # Interfaces para los Gateways
+│   │   └── theme_repository.dart
+│   ├── 📁 gateways/               # Interfaces de infraestructura externa (ej. Firebase)
+│   │   └── theme_gateway.dart
+│   ├── 📁 use_cases               # Lógica del negocio
+│   │   ├── get_current_theme.dart
+│   │   └── set_theme_from_remote.dart
+├── 📁 application                 # ⚙️ CAPA DE APLICACIÓN
+│   ├── 📁 blocs                   # Manejo del estado
+│   │   └── theme_bloc.dart
+│   ├── 📁 managers                # Inyección de dependencias, coordinación general
+│   │   └── app_manager.dart
+├── 📁 presentation                # 🎨 CAPA DE PRESENTACIÓN
+│   ├── 📁 pages                   # Vistas completas
+│   │   └── home_page.dart
+│   ├── 📁 widgets                 # Componentes visuales reutilizables
+│   │   └── theme_card.dart
+├── 📁 main.dart                   # Punto de entrada de la app
