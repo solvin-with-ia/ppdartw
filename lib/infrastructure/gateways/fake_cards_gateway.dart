@@ -2,8 +2,8 @@ import '../../domains/gateways/cards_gateway.dart';
 import '../services/fake_service_ws_database.dart';
 
 class FakeCardsGateway implements CardsGateway {
-  final FakeServiceWsDatabase db;
   FakeCardsGateway(this.db);
+  final FakeServiceWsDatabase db;
 
   @override
   Future<void> saveCard(Map<String, dynamic> cardJson) {

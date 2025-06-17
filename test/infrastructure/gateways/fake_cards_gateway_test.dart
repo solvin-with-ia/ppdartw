@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ppdartw/infrastructure/gateways/fake_cards_gateway.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_ws_database.dart';
@@ -11,7 +13,7 @@ void main() {
       gateway = FakeCardsGateway(db);
     });
 
-    final cardJson = {
+    final Map<String, Object> cardJson = <String, Object>{
       'id': 'c1',
       'display': '1',
       'value': 1,
@@ -21,29 +23,37 @@ void main() {
 
     test('save and read card', () async {
       await gateway.saveCard(cardJson);
-      final card = await gateway.readCard('c1');
+      final Map<String, dynamic>? card = await gateway.readCard('c1');
       expect(card, isNotNull);
       expect(card!['id'], 'c1');
     });
 
     test('cardStream emits on save', () async {
-      final emitted = <Map<String, dynamic>?>[];
-      final sub = gateway.cardStream('c1').listen(emitted.add);
+      final List<Map<String, dynamic>?> emitted = <Map<String, dynamic>?>[];
+      final StreamSubscription<Map<String, dynamic>?> sub = gateway
+          .cardStream('c1')
+          .listen(emitted.add);
       await gateway.saveCard(cardJson);
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       expect(emitted.last, isNotNull);
       expect(emitted.last!['id'], 'c1');
       await sub.cancel();
     });
 
     test('cardsStream emits all cards', () async {
-      final emitted = <List<Map<String, dynamic>>>[];
-      final sub = gateway.cardsStream().listen(emitted.add);
+      final List<List<Map<String, dynamic>>> emitted =
+          <List<Map<String, dynamic>>>[];
+      final StreamSubscription<List<Map<String, dynamic>>> sub = gateway
+          .cardsStream()
+          .listen(emitted.add);
       await gateway.saveCard(cardJson);
-      await gateway.saveCard({...cardJson, 'id': 'c2'});
-      await Future.delayed(const Duration(milliseconds: 10));
+      await gateway.saveCard(<String, dynamic>{...cardJson, 'id': 'c2'});
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       expect(emitted.last.length, 2);
-      expect(emitted.last.map((c) => c['id']).toSet(), {'c1', 'c2'});
+      expect(
+        emitted.last.map((Map<String, dynamic> c) => c['id']).toSet(),
+        <String>{'c1', 'c2'},
+      );
       await sub.cancel();
     });
   });

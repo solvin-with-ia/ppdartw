@@ -1,19 +1,22 @@
+import 'package:jocaagura_domain/jocaagura_domain.dart';
+
 import '../../domains/gateways/session_gateway.dart';
 import '../services/fake_service_session.dart';
 
 class FakeSessionGateway implements SessionGateway {
-  final FakeServiceSession session;
   FakeSessionGateway(this.session);
+  final FakeServiceSession session;
 
   @override
-  Stream<Map<String, dynamic>?> get userStream => session.userStream.map((u) => u?.toJson());
+  Stream<Map<String, dynamic>?> get userStream =>
+      session.userStream.map((UserModel? u) => u?.toJson());
 
   @override
   Map<String, dynamic>? get currentUser => session.currentUser?.toJson();
 
   @override
   Future<Map<String, dynamic>?> signInWithGoogle() async {
-    final user = await session.signInWithGoogle();
+    final UserModel? user = await session.signInWithGoogle();
     return user?.toJson();
   }
 
