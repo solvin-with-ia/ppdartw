@@ -1,6 +1,6 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-import 'session_repository.dart';
+import '../../repositories/session_repository.dart';
 
 class GetUserStreamUsecase {
   const GetUserStreamUsecase(this.repository);

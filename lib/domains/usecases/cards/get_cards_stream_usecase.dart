@@ -1,6 +1,6 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import '../../models/card_model.dart';
-import 'cards_repository.dart';
+import '../../repositories/cards_repository.dart';
 
 class GetCardsStreamUsecase {
   const GetCardsStreamUsecase(this.repository);

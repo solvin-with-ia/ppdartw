@@ -1,6 +1,6 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-import '../../models/card_model.dart';
+import '../models/card_model.dart';
 
 abstract class CardsRepository {
   Future<Either<ErrorItem, void>> saveCard(CardModel card);
