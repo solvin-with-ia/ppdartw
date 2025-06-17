@@ -1,3 +1,9 @@
+## 0.0.8
+
+- Se agregan las clases abstractas y fakes para GameGateway, CardsGateway y SessionGateway.
+- Implementaciones fake integradas con los servicios simulados.
+- Tests unitarios completos para cada gateway (guardar, leer, streams, login/logout, etc.).
+
 ## 0.0.7
 
 - Se agrega la abstracción ServiceSession para gestión de sesión/autenticación de usuario.
