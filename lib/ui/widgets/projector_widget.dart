@@ -32,17 +32,19 @@ class ProjectorWidget extends StatelessWidget {
           heightScale = screenHeight;
           widthScale = heightScale * aspectRatio;
         }
-        return Center(
-          child: SizedBox(
-            width: widthScale,
-            height: heightScale,
-            child: AspectRatio(
-              aspectRatio: aspectRatio,
-              child: FittedBox(
-                child: SizedBox(
-                  width: usedWidth,
-                  height: usedHeight,
-                  child: child,
+        return Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: widthScale,
+              height: heightScale,
+              child: AspectRatio(
+                aspectRatio: aspectRatio,
+                child: FittedBox(
+                  child: SizedBox(
+                    width: usedWidth,
+                    height: usedHeight,
+                    child: child,
+                  ),
                 ),
               ),
             ),
