@@ -1,11 +1,11 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
 import '../../domains/gateways/session_gateway.dart';
-import '../services/fake_service_session.dart';
+import '../../domains/services/service_session.dart';
 
-class FakeSessionGateway implements SessionGateway {
-  FakeSessionGateway(this.session);
-  final FakeServiceSession session;
+class SessionGatewayImpl implements SessionGateway {
+  SessionGatewayImpl(this.session);
+  final ServiceSession session;
 
   @override
   Stream<Map<String, dynamic>?> get userStream =>

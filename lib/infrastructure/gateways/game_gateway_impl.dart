@@ -1,9 +1,9 @@
 import '../../domains/gateways/game_gateway.dart';
-import '../services/fake_service_ws_database.dart';
+import '../../domains/services/service_ws_database.dart';
 
-class FakeGameGateway implements GameGateway {
-  FakeGameGateway(this.db);
-  final FakeServiceWsDatabase db;
+class GameGatewayImpl implements GameGateway {
+  GameGatewayImpl(this.db);
+  final ServiceWsDatabase db;
 
   @override
   Future<void> saveGame(Map<String, dynamic> gameJson) {

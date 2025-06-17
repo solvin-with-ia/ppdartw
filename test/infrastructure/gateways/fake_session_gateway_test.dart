@@ -1,14 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ppdartw/infrastructure/gateways/fake_session_gateway.dart';
+import 'package:ppdartw/domains/gateways/session_gateway.dart';
+import 'package:ppdartw/infrastructure/gateways/session_gateway_impl.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_session.dart';
 
 void main() {
   group('FakeSessionGateway', () {
-    late FakeSessionGateway gateway;
+    late SessionGateway gateway;
     setUp(() {
-      gateway = FakeSessionGateway(FakeServiceSession());
+      gateway = SessionGatewayImpl(FakeServiceSession());
     });
 
     test('userStream emits null initially', () async {

@@ -1,3 +1,11 @@
+## 0.1.0
+
+- Migración de fakes a gateways *Impl* para Game, Cards y Session.
+- Refactor de repositorios para uso explícito de gateways impl.
+- Cobertura total de tests unitarios para gateways y repositorios, ajustados a nueva arquitectura.
+- Manejo robusto de sesión y errores con Either: userStream ahora emite Right(null) al cerrar sesión.
+- Limpieza de imports y mejoras menores de tipado en tests.
+
 ## 0.0.8
 
 - Se agregan las clases abstractas y fakes para GameGateway, CardsGateway y SessionGateway.

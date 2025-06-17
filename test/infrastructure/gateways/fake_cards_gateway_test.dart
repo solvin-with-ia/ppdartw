@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ppdartw/infrastructure/gateways/fake_cards_gateway.dart';
+import 'package:ppdartw/infrastructure/gateways/cards_gateway_impl.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_ws_database.dart';
 
 void main() {
   group('FakeCardsGateway', () {
     late FakeServiceWsDatabase db;
-    late FakeCardsGateway gateway;
+    late CardsGatewayImpl gateway;
     setUp(() {
       db = FakeServiceWsDatabase();
-      gateway = FakeCardsGateway(db);
+      gateway = CardsGatewayImpl(db);
     });
 
     final Map<String, Object> cardJson = <String, Object>{
