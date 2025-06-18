@@ -1,14 +1,18 @@
 import 'dart:async';
+
 import 'package:jocaagura_domain/jocaagura_domain.dart';
+
 import '../domains/models/card_model.dart';
 import '../domains/models/game_model.dart';
 import '../domains/models/vote_model.dart';
+import '../domains/usecases/game/create_game_usecase.dart';
 import 'bloc_session.dart';
 
 /// Bloc para manejar la lógica de creación y estado de la partida actual.
 class BlocGame {
-  BlocGame(this.blocSession);
+  BlocGame({required this.blocSession, required this.createGameUsecase});
   final BlocSession blocSession;
+  final CreateGameUsecase createGameUsecase;
 
   final BlocGeneral<GameModel> _gameBloc = BlocGeneral<GameModel>(
     GameModel.empty(),
@@ -17,7 +21,7 @@ class BlocGame {
   Stream<GameModel> get gameStream => _gameBloc.stream;
   GameModel? get currentGame => _gameBloc.value;
 
-  void createGame({required String name}) {
+  Future<void> createGame({required String name}) async {
     final UserModel? admin = blocSession.user;
     if (admin == null) {
       // Aquí podrías redirigir al login, por ahora simplemente retorna
@@ -34,7 +38,15 @@ class BlocGame {
       createdAt: DateTime.now(),
       deck: const <CardModel>[],
     );
-    _gameBloc.value = game;
+    final Either<ErrorItem, void> result = await createGameUsecase.call(game);
+    result.fold(
+      (ErrorItem error) {
+        // Manejo de error opcional
+      },
+      (_) {
+        _gameBloc.value = game;
+      },
+    );
   }
 
   void updateGameName(String newName) {

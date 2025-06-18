@@ -27,12 +27,12 @@ class GameModel {
   factory GameModel.empty() => GameModel(
     id: '',
     name: '',
-    admin: UserModel(
+    admin: const UserModel(
       id: '',
       displayName: '',
       email: '',
       photoUrl: '',
-      jwt: const {},
+      jwt: <String, dynamic>{},
     ),
     spectators: const <UserModel>[],
     players: const <UserModel>[],

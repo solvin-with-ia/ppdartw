@@ -1,3 +1,8 @@
+## 0.7.0
+
+- Fix visual: Se corrigió un overflow horizontal en LogoHorizontalWidget usando Expanded para el texto, mejorando la robustez visual en todas las resoluciones.
+- Mejoras menores de layout y consistencia visual.
+
 ## 0.6.0
 
 - BlocGame ahora consume BlocSession para asignar automáticamente el usuario logueado como admin de la partida.

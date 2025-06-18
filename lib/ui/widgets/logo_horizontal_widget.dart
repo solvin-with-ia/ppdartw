@@ -13,6 +13,7 @@ class LogoHorizontalWidget extends StatelessWidget {
       height: 110,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           SizedBox(
             width: 60,
@@ -20,7 +21,12 @@ class LogoHorizontalWidget extends StatelessWidget {
             child: Image.asset('assets/logo_w.png', fit: BoxFit.contain),
           ),
           const SizedBox(width: 8),
-          SizedBox(width: 145, height: 21, child: InlineTextWidget(label)),
+          Expanded(
+            child: SizedBox(
+              height: 21,
+              child: InlineTextWidget(label),
+            ),
+          ),
         ],
       ),
     );
