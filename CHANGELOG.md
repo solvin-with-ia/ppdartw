@@ -1,3 +1,10 @@
+## 0.8.0
+
+- Nueva infraestructura BlocModal para mostrar modales y notificaciones globales de forma reactiva y desacoplada.
+- Integración de BackdropWidget para overlays visuales y notificaciones.
+- ProjectViewsWidget ahora soporta modales globales.
+- Nuevos tests unitarios para BlocModal y cobertura de AppStateManager con BlocModal.
+
 ## 0.7.0
 
 - Fix visual: Se corrigió un overflow horizontal en LogoHorizontalWidget usando Expanded para el texto, mejorando la robustez visual en todas las resoluciones.

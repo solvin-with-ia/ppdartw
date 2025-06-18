@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
 import 'package:ppdartw/blocs/bloc_loading.dart';
+import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
 import 'package:ppdartw/blocs/bloc_theme.dart';
@@ -113,6 +114,7 @@ void main() {
     final BlocNavigator blocNavigator = BlocNavigator(blocSession);
     final DummyBlocLoading blocLoading = DummyBlocLoading();
     final DummyBlocGame blocGame = DummyBlocGame();
+    final BlocModal blocModal = BlocModal();
     await tester.pumpWidget(
       AppStateManager(
         blocTheme: blocTheme,
@@ -120,6 +122,7 @@ void main() {
         blocGame: blocGame,
         blocNavigator: blocNavigator,
         blocLoading: blocLoading,
+        blocModal: blocModal,
         child: const DummyChild(),
       ),
     );

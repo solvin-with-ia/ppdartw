@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 
 /// Widget que reacciona al stream de BlocNavigator y muestra la vista correspondiente.
 import '../../blocs/bloc_loading.dart';
+import '../../blocs/bloc_modal.dart';
 import '../../blocs/bloc_navigator.dart';
+import '../../shared/app_state_manager.dart';
 import '../../views/create_game_view.dart';
 import '../../views/enum_views.dart';
 import '../../views/splash_view.dart';
+import 'backdrop_widget.dart';
 import 'loading_widget.dart';
 
 class ProjectViewsWidget extends StatelessWidget {
@@ -19,6 +22,7 @@ class ProjectViewsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final BlocModal? blocModal = AppStateManager.of(context).blocModal;
     return Stack(
       children: <Widget>[
         StreamBuilder<EnumViews>(
@@ -45,6 +49,17 @@ class ProjectViewsWidget extends StatelessWidget {
             return LoadingWidget(loadingMsg: msg);
           },
         ),
+        if (blocModal != null)
+          StreamBuilder<Widget?>(
+            stream: blocModal.stream,
+            builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+              final Widget? modal = snapshot.data;
+              if (modal == null) {
+                return const SizedBox.shrink();
+              }
+              return BackdropWidget(child: modal);
+            },
+          ),
       ],
     );
   }

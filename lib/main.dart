@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'blocs/bloc_game.dart';
 import 'blocs/bloc_loading.dart';
+import 'blocs/bloc_modal.dart';
 import 'blocs/bloc_navigator.dart';
 import 'blocs/bloc_session.dart';
 import 'blocs/bloc_theme.dart';
@@ -57,6 +58,8 @@ void main() {
 
   final BlocNavigator blocNavigator = BlocNavigator(blocSession);
   final BlocLoading blocLoading = BlocLoading();
+  final BlocModal blocModal = BlocModal();
+
   runApp(
     AppStateManager(
       blocTheme: blocTheme,
@@ -64,6 +67,7 @@ void main() {
       blocGame: blocGame,
       blocNavigator: blocNavigator,
       blocLoading: blocLoading,
+      blocModal: blocModal,
       child: const MyApp(),
     ),
   );
