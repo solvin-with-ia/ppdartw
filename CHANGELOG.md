@@ -1,3 +1,12 @@
+## 0.4.0
+
+- Refactor de LoadingWidget y ProjectViewsWidget a /ui/widgets para mejor modularidad y extensibilidad.
+- Nuevo BackdropWidget para overlays reutilizables (loading, notificaciones, etc.).
+- BlocLoading ahora incluye clearMsg() y isLoading para mayor control y consultas.
+- Test unitario robusto para BlocLoading.
+- Integración con text_responsive en LoadingWidget.
+- Limpieza y organización de archivos legacy en /views.
+
 ## 0.3.0
 
 - Integración de BlocNavigator para navegación reactiva centralizada usando EnumViews.

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
+import 'package:ppdartw/blocs/bloc_loading.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_theme.dart';
 import 'package:ppdartw/domains/blocs/bloc_session.dart';
@@ -15,6 +16,13 @@ class DummyChild extends StatelessWidget {
 
 class DummyBlocSession extends BlocSession {
   DummyBlocSession() : super(_DummySessionRepository());
+}
+
+class DummyBlocLoading extends BlocLoading {
+  @override
+  String get msg => '';
+  @override
+  Stream<String> get msgStream => const Stream<String>.empty();
 }
 
 class _DummySessionRepository implements SessionRepository {
@@ -49,11 +57,13 @@ void main() {
     final BlocTheme blocTheme = BlocTheme();
     final BlocSession blocSession = DummyBlocSession();
     final BlocNavigator blocNavigator = BlocNavigator(blocSession);
+    final DummyBlocLoading blocLoading = DummyBlocLoading();
     await tester.pumpWidget(
       AppStateManager(
         blocTheme: blocTheme,
         blocSession: blocSession,
         blocNavigator: blocNavigator,
+        blocLoading: blocLoading,
         child: const DummyChild(),
       ),
     );

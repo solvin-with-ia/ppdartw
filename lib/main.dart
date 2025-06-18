@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'blocs/bloc_loading.dart';
 import 'blocs/bloc_navigator.dart';
 import 'blocs/bloc_theme.dart';
 import 'domains/blocs/bloc_session.dart';
@@ -10,7 +11,7 @@ import 'infrastructure/repositories/session_repository_impl.dart';
 import 'infrastructure/services/fake_service_session.dart';
 import 'shared/app_state_manager.dart';
 import 'shared/theme.dart';
-import 'views/project_views_widget.dart';
+import 'ui/widgets/project_views_widget.dart';
 
 void main() {
   final BlocTheme blocTheme = BlocTheme();
@@ -21,11 +22,13 @@ void main() {
   );
   final BlocSession blocSession = BlocSession(sessionRepository);
   final BlocNavigator blocNavigator = BlocNavigator(blocSession);
+  final BlocLoading blocLoading = BlocLoading();
   runApp(
     AppStateManager(
       blocTheme: blocTheme,
       blocSession: blocSession,
       blocNavigator: blocNavigator,
+      blocLoading: blocLoading,
       child: const MyApp(),
     ),
   );
@@ -46,7 +49,13 @@ class MyApp extends StatelessWidget {
           final BlocNavigator blocNavigator = AppStateManager.of(
             context,
           ).blocNavigator;
-          return ProjectViewsWidget(blocNavigator: blocNavigator);
+          final BlocLoading blocLoading = AppStateManager.of(
+            context,
+          ).blocLoading;
+          return ProjectViewsWidget(
+            blocNavigator: blocNavigator,
+            blocLoading: blocLoading,
+          );
         },
       ),
     );
