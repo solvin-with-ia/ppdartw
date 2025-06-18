@@ -1,3 +1,11 @@
+## 0.3.0
+
+- Integración de BlocNavigator para navegación reactiva centralizada usando EnumViews.
+- Nuevo widget ProjectViewsWidget que reacciona al stream de navegación y muestra la vista correspondiente.
+- AppStateManager ahora expone blocNavigator y permite acceso global a la navegación y sesión.
+- Refactor de main.dart para usar navegación reactiva y desacoplada.
+- Pruebas unitarias completas para AppStateManager y navegación.
+
 ## 0.2.0
 
 - Integración global de BlocSession en AppStateManager (estado de sesión disponible en toda la app).

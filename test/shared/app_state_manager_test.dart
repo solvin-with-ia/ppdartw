@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
+import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_theme.dart';
 import 'package:ppdartw/domains/blocs/bloc_session.dart';
 import 'package:ppdartw/domains/repositories/session_repository.dart';
@@ -42,15 +43,17 @@ class _DummySessionRepository implements SessionRepository {
 }
 
 void main() {
-  testWidgets('AppStateManager expone blocTheme y blocSession', (
+  testWidgets('AppStateManager expone blocTheme, blocSession y blocNavigator', (
     WidgetTester tester,
   ) async {
     final BlocTheme blocTheme = BlocTheme();
     final BlocSession blocSession = DummyBlocSession();
+    final BlocNavigator blocNavigator = BlocNavigator(blocSession);
     await tester.pumpWidget(
       AppStateManager(
         blocTheme: blocTheme,
         blocSession: blocSession,
+        blocNavigator: blocNavigator,
         child: const DummyChild(),
       ),
     );
@@ -58,5 +61,6 @@ void main() {
     final AppStateManager manager = AppStateManager.of(context);
     expect(manager.blocTheme, blocTheme);
     expect(manager.blocSession, blocSession);
+    expect(manager.blocNavigator, blocNavigator);
   });
 }
