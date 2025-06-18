@@ -6,11 +6,18 @@ import '../domains/models/card_model.dart';
 import '../domains/models/game_model.dart';
 import '../domains/models/vote_model.dart';
 import '../domains/usecases/game/create_game_usecase.dart';
+import 'bloc_modal.dart';
 import 'bloc_session.dart';
 
 /// Bloc para manejar la lógica de creación y estado de la partida actual.
 class BlocGame {
-  BlocGame({required this.blocSession, required this.createGameUsecase});
+  BlocGame({
+    required this.blocSession,
+    required this.createGameUsecase,
+    required this.blocModal,
+  });
+
+  final BlocModal blocModal;
   final BlocSession blocSession;
   final CreateGameUsecase createGameUsecase;
 
@@ -19,7 +26,10 @@ class BlocGame {
   );
 
   Stream<GameModel> get gameStream => _gameBloc.stream;
-  GameModel? get currentGame => _gameBloc.value;
+  GameModel? get selectedGame => _gameBloc.value;
+
+  /// Valida si el nombre de la partida es válido según las reglas de negocio (>= 3 caracteres)
+  bool get isNameValid => _gameBloc.value.name.trim().length >= 3;
 
   Future<void> createGame({required String name}) async {
     final UserModel? admin = blocSession.user;

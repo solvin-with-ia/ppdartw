@@ -51,14 +51,15 @@ void main() {
   final GameRepository gameRepository = GameRepositoryImpl(gameGateway);
   final CreateGameUsecase createGameUsecase = CreateGameUsecase(gameRepository);
 
+  final BlocModal blocModal = BlocModal();
   final BlocGame blocGame = BlocGame(
+    blocModal: blocModal,
     blocSession: blocSession,
     createGameUsecase: createGameUsecase,
   );
 
   final BlocNavigator blocNavigator = BlocNavigator(blocSession);
   final BlocLoading blocLoading = BlocLoading();
-  final BlocModal blocModal = BlocModal();
 
   runApp(
     AppStateManager(

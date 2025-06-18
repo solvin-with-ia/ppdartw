@@ -37,10 +37,11 @@ class DummyBlocSession extends BlocSession {
 }
 
 class DummyBlocGame extends BlocGame {
-  DummyBlocGame()
+  DummyBlocGame({required BlocModal blocModal})
     : super(
         blocSession: DummyBlocSession(),
         createGameUsecase: DummyCreateGameUsecase(),
+        blocModal: blocModal,
       );
 }
 
@@ -113,8 +114,8 @@ void main() {
     final BlocSession blocSession = DummyBlocSession();
     final BlocNavigator blocNavigator = BlocNavigator(blocSession);
     final DummyBlocLoading blocLoading = DummyBlocLoading();
-    final DummyBlocGame blocGame = DummyBlocGame();
     final BlocModal blocModal = BlocModal();
+    final DummyBlocGame blocGame = DummyBlocGame(blocModal: blocModal);
     await tester.pumpWidget(
       AppStateManager(
         blocTheme: blocTheme,
