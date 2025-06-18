@@ -7,6 +7,64 @@ import 'vote_model.dart';
 
 @immutable
 class GameModel {
+  const GameModel({
+    required this.id,
+    required this.name,
+    required this.admin,
+    required this.spectators,
+    required this.players,
+    required this.votes,
+    required this.isActive,
+    required this.createdAt,
+    required this.deck,
+    this.finishedAt,
+    this.isNew = false,
+    this.currentStory,
+    this.stories = const <String>[],
+    this.revealTimeout,
+  });
+
+  factory GameModel.empty() => GameModel(
+    id: '',
+    name: '',
+    admin: UserModel(
+      id: '',
+      displayName: '',
+      email: '',
+      photoUrl: '',
+      jwt: const {},
+    ),
+    spectators: const <UserModel>[],
+    players: const <UserModel>[],
+    votes: const <VoteModel>[],
+    isActive: false,
+    createdAt: DateTime.now(),
+    deck: const <CardModel>[],
+    isNew: true,
+  );
+  factory GameModel.fromJson(Map<String, dynamic> json) => GameModel(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    admin: UserModel.fromJson(json['admin'] as Map<String, dynamic>),
+    spectators: convertJsonToModelList<UserModel>(
+      json['spectators'],
+      UserModel.fromJson,
+    ),
+    players: convertJsonToModelList<UserModel>(
+      json['players'],
+      UserModel.fromJson,
+    ),
+    votes: convertJsonToModelList<VoteModel>(json['votes'], VoteModel.fromJson),
+    isActive: Utils.getBoolFromDynamic(json['isActive']),
+    createdAt: DateTime.parse(json['createdAt'] as String),
+    finishedAt: DateUtils.dateTimeFromDynamic(json['finishedAt']),
+    currentStory: Utils.getStringFromDynamic(json['currentStory']),
+    stories: (json['stories'] is List)
+        ? List<String>.from(json['stories'] as List<String>)
+        : Utils.convertJsonToList(json['stories']?.toString() ?? ''),
+    deck: convertJsonToModelList<CardModel>(json['deck'], CardModel.fromJson),
+    revealTimeout: json['revealTimeout'] as int?,
+  );
   final bool isNew;
   // ...
   GameModel copyWith({
@@ -37,59 +95,6 @@ class GameModel {
     );
   }
 
-  factory GameModel.empty() => GameModel(
-    id: '',
-    name: '',
-    admin: null, // o UserModel.empty() si tienes uno
-    spectators: const [],
-    players: const [],
-    votes: const [],
-    isActive: false,
-    createdAt: DateTime.now(),
-    deck: const [],
-    finishedAt: null,
-    isNew: true,
-  );
-
-  const GameModel({
-    required this.id,
-    required this.name,
-    required this.admin,
-    required this.spectators,
-    required this.players,
-    required this.votes,
-    required this.isActive,
-    required this.createdAt,
-    required this.deck,
-    this.finishedAt,
-    this.isNew = false,
-    this.currentStory,
-    this.stories = const <String>[],
-    this.revealTimeout,
-  });
-  factory GameModel.fromJson(Map<String, dynamic> json) => GameModel(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    admin: UserModel.fromJson(json['admin'] as Map<String, dynamic>),
-    spectators: convertJsonToModelList<UserModel>(
-      json['spectators'],
-      UserModel.fromJson,
-    ),
-    players: convertJsonToModelList<UserModel>(
-      json['players'],
-      UserModel.fromJson,
-    ),
-    votes: convertJsonToModelList<VoteModel>(json['votes'], VoteModel.fromJson),
-    isActive: Utils.getBoolFromDynamic(json['isActive']),
-    createdAt: DateTime.parse(json['createdAt'] as String),
-    finishedAt: DateUtils.dateTimeFromDynamic(json['finishedAt']),
-    currentStory: Utils.getStringFromDynamic(json['currentStory']),
-    stories: (json['stories'] is List)
-        ? List<String>.from(json['stories'] as List<String>)
-        : Utils.convertJsonToList(json['stories']?.toString() ?? ''),
-    deck: convertJsonToModelList<CardModel>(json['deck'], CardModel.fromJson),
-    revealTimeout: json['revealTimeout'] as int?,
-  );
   final String id;
   final String name;
   final UserModel admin;

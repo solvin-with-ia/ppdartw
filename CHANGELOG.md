@@ -1,3 +1,10 @@
+## 0.6.0
+
+- BlocGame ahora consume BlocSession para asignar automáticamente el usuario logueado como admin de la partida.
+- Refactor de GameModel.empty para garantizar null safety y evitar errores en tests/unitarios.
+- Tests unitarios robustos para BlocGame, incluyendo flujo de creación y actualización de partida.
+- Fix de inicialización de admin en GameModel y eliminación de posibles nulos.
+
 ## 0.5.0
 
 - Migración definitiva de todos los BLoCs a `lib/blocs` (removido domains/blocs).
