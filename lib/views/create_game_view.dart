@@ -44,12 +44,8 @@ class _CreateGameViewState extends State<CreateGameView> {
                     ? MainAxisAlignment.center
                     : MainAxisAlignment.start,
                 children: const <Widget>[
-                  LogoHorizontalWidget(),
+                  LogoHorizontalWidget(label: 'Crear partida'),
                   SizedBox(width: 16),
-                  Text(
-                    'Crear partida',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
                 ],
               ),
             ),
