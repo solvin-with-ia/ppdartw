@@ -1,3 +1,10 @@
+## 0.2.0
+
+- Integración global de BlocSession en AppStateManager (estado de sesión disponible en toda la app).
+- Nuevos tests unitarios para BlocSession y AppStateManager.
+- Refactor y stubs para SessionRepository en pruebas.
+- Mejoras de arquitectura y cobertura de tests.
+
 ## 0.1.0
 
 - Migración de fakes a gateways *Impl* para Game, Cards y Session.
