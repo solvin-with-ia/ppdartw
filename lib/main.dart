@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'blocs/bloc_loading.dart';
 import 'blocs/bloc_navigator.dart';
+import 'blocs/bloc_session.dart';
 import 'blocs/bloc_theme.dart';
-import 'domains/blocs/bloc_session.dart';
 import 'domains/repositories/session_repository.dart';
 import 'domains/services/service_session.dart';
 import 'infrastructure/gateways/session_gateway_impl.dart';

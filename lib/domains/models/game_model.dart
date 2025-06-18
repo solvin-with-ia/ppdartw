@@ -7,6 +7,50 @@ import 'vote_model.dart';
 
 @immutable
 class GameModel {
+  final bool isNew;
+  // ...
+  GameModel copyWith({
+    String? id,
+    String? name,
+    UserModel? admin,
+    List<UserModel>? spectators,
+    List<UserModel>? players,
+    List<VoteModel>? votes,
+    bool? isActive,
+    DateTime? createdAt,
+    List<CardModel>? deck,
+    DateTime? finishedAt,
+    bool? isNew,
+  }) {
+    return GameModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      admin: admin ?? this.admin,
+      spectators: spectators ?? this.spectators,
+      players: players ?? this.players,
+      votes: votes ?? this.votes,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      deck: deck ?? this.deck,
+      finishedAt: finishedAt ?? this.finishedAt,
+      isNew: isNew ?? this.isNew,
+    );
+  }
+
+  factory GameModel.empty() => GameModel(
+    id: '',
+    name: '',
+    admin: null, // o UserModel.empty() si tienes uno
+    spectators: const [],
+    players: const [],
+    votes: const [],
+    isActive: false,
+    createdAt: DateTime.now(),
+    deck: const [],
+    finishedAt: null,
+    isNew: true,
+  );
+
   const GameModel({
     required this.id,
     required this.name,
@@ -18,6 +62,7 @@ class GameModel {
     required this.createdAt,
     required this.deck,
     this.finishedAt,
+    this.isNew = false,
     this.currentStory,
     this.stories = const <String>[],
     this.revealTimeout,
