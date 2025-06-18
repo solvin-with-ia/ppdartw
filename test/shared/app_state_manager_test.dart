@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_loading.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
+import 'package:ppdartw/blocs/bloc_session.dart';
 import 'package:ppdartw/blocs/bloc_theme.dart';
-import 'package:ppdartw/domains/blocs/bloc_session.dart';
 import 'package:ppdartw/domains/repositories/session_repository.dart';
 import 'package:ppdartw/shared/app_state_manager.dart';
 

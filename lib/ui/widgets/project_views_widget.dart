@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// Widget que reacciona al stream de BlocNavigator y muestra la vista correspondiente.
 import '../../blocs/bloc_loading.dart';
 import '../../blocs/bloc_navigator.dart';
+import '../../views/create_game_view.dart';
 import '../../views/enum_views.dart';
 import '../../views/splash_view.dart';
 import 'loading_widget.dart';
@@ -28,6 +29,8 @@ class ProjectViewsWidget extends StatelessWidget {
             switch (view) {
               case EnumViews.splash:
                 return const SplashView();
+              case EnumViews.createGame:
+                return const CreateGameView();
             }
           },
         ),

@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import '../blocs/bloc_loading.dart';
 import '../blocs/bloc_navigator.dart';
+import '../blocs/bloc_session.dart';
 import '../blocs/bloc_theme.dart';
-import '../domains/blocs/bloc_session.dart';
 
 class AppStateManager extends InheritedWidget {
   const AppStateManager({

@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
 import '../domains/repositories/session_repository.dart';
 
-/// BlocSession controlado por BlocModule y BlocGeneral
-class BlocSession extends BlocModule {
+/// Bloc para manejar la sesión del usuario.
+class BlocSession {
   BlocSession(this._sessionRepository) {
     _sessionRepository.userStream.listen((
       Either<ErrorItem, UserModel?> either,
@@ -37,11 +39,9 @@ class BlocSession extends BlocModule {
   /// Cerrar sesión
   void signOut() {
     _sessionRepository.signOut();
-
     _userBloc.value = null;
   }
 
-  @override
   void dispose() {
     _userBloc.dispose();
   }

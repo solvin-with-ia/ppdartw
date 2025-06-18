@@ -1,6 +1,7 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import '../domains/blocs/bloc_session.dart';
+
 import '../views/enum_views.dart';
+import 'bloc_session.dart';
 
 /// Bloc para manejar la navegación reactiva entre vistas principales de la app.
 class BlocNavigator {
@@ -42,6 +43,8 @@ class BlocNavigator {
     // Por ahora solo splash es pública
     switch (view) {
       case EnumViews.splash:
+        return true;
+      case EnumViews.createGame:
         return false;
       // case EnumViews.home:
       //   return true;

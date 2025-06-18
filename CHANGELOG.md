@@ -1,3 +1,9 @@
+## 0.5.0
+
+- Migración definitiva de todos los BLoCs a `lib/blocs` (removido domains/blocs).
+- Limpieza y corrección de imports en toda la base de código.
+- Fix de tests unitarios y cobertura para robustez y consistencia.
+
 ## 0.4.0
 
 - Refactor de LoadingWidget y ProjectViewsWidget a /ui/widgets para mejor modularidad y extensibilidad.
