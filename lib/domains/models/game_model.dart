@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
+import '../../domain/enums/role.dart';
 import 'card_model.dart';
 import 'model_utils.dart';
 import 'vote_model.dart';
 
 @immutable
 class GameModel {
+  // Agregado para el rol del usuario
   const GameModel({
     required this.id,
     required this.name,
@@ -22,6 +24,7 @@ class GameModel {
     this.currentStory,
     this.stories = const <String>[],
     this.revealTimeout,
+    this.role = Role.jugador,
   });
 
   factory GameModel.empty() => GameModel(
@@ -38,7 +41,7 @@ class GameModel {
     players: const <UserModel>[],
     votes: const <VoteModel>[],
     isActive: false,
-    createdAt: DateTime.now(),
+    createdAt: DateTime(1970),
     deck: const <CardModel>[],
     isNew: true,
   );
@@ -65,6 +68,7 @@ class GameModel {
     deck: convertJsonToModelList<CardModel>(json['deck'], CardModel.fromJson),
     revealTimeout: json['revealTimeout'] as int?,
   );
+  final Role? role;
   final bool isNew;
   // ...
   GameModel copyWith({
@@ -79,6 +83,7 @@ class GameModel {
     List<CardModel>? deck,
     DateTime? finishedAt,
     bool? isNew,
+    Role? role,
   }) {
     return GameModel(
       id: id ?? this.id,
@@ -92,6 +97,7 @@ class GameModel {
       deck: deck ?? this.deck,
       finishedAt: finishedAt ?? this.finishedAt,
       isNew: isNew ?? this.isNew,
+      role: role ?? this.role,
     );
   }
 

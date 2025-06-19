@@ -1,3 +1,13 @@
+## 0.9.0
+
+- Refactor completo de NameAndRoleModal: ahora es 100% stateless y reactivo, sin estado local.
+- Unificación de todos los inputs de texto usando CustomInputWidget en todo el proyecto.
+- Eliminación de todos los TextField directos y lógica duplicada de inputs.
+- Modal y flujo de creación de partida ahora usan solo el estado del bloc (sin duplicidad).
+- Fix de overflow visual y modal completamente responsive.
+- Selección de rol totalmente reactiva y sin errores visuales.
+- Limpieza de imports y código muerto.
+
 ## 0.8.0
 
 - Nueva infraestructura BlocModal para mostrar modales y notificaciones globales de forma reactiva y desacoplada.

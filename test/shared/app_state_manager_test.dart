@@ -37,11 +37,10 @@ class DummyBlocSession extends BlocSession {
 }
 
 class DummyBlocGame extends BlocGame {
-  DummyBlocGame({required BlocModal blocModal})
+  DummyBlocGame({required super.blocModal})
     : super(
         blocSession: DummyBlocSession(),
         createGameUsecase: DummyCreateGameUsecase(),
-        blocModal: blocModal,
       );
 }
 

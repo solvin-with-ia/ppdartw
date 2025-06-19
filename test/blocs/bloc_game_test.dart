@@ -158,12 +158,12 @@ void main() {
 
     test('Estado inicial es GameModel.empty()', () {
       expect(blocGame.selectedGame, isA<GameModel>());
-      expect(blocGame.selectedGame!.isNew, isTrue);
+      expect(blocGame.selectedGame.isNew, isTrue);
     });
 
     test('createGame crea un nuevo GameModel con el admin logueado', () async {
       await blocGame.createGame(name: 'Partida Test');
-      final GameModel game = blocGame.selectedGame!;
+      final GameModel game = blocGame.selectedGame;
       expect(game.name, 'Partida Test');
       expect(game.admin.id, 'dummy');
       expect(game.isNew, isFalse); // Dependiendo de la lógica
@@ -172,7 +172,7 @@ void main() {
     test('updateGameName actualiza el nombre de la partida', () {
       blocGame.createGame(name: 'Partida Test');
       blocGame.updateGameName('Nuevo Nombre');
-      expect(blocGame.selectedGame?.name, 'Nuevo Nombre');
+      expect(blocGame.selectedGame.name, 'Nuevo Nombre');
     });
 
     test('dispose no lanza errores', () {

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
+import '../domain/enums/role.dart';
 import '../domains/models/card_model.dart';
 import '../domains/models/game_model.dart';
 import '../domains/models/vote_model.dart';
@@ -26,7 +27,7 @@ class BlocGame {
   );
 
   Stream<GameModel> get gameStream => _gameBloc.stream;
-  GameModel? get selectedGame => _gameBloc.value;
+  GameModel get selectedGame => _gameBloc.value;
 
   /// Valida si el nombre de la partida es válido según las reglas de negocio (>= 3 caracteres)
   bool get isNameValid => _gameBloc.value.name.trim().length >= 3;
@@ -57,6 +58,12 @@ class BlocGame {
         _gameBloc.value = game;
       },
     );
+  }
+
+  Role? get selectedRole => _gameBloc.value.role;
+
+  void updateGameRole(Role role) {
+    _gameBloc.value = _gameBloc.value.copyWith(role: role);
   }
 
   void updateGameName(String newName) {

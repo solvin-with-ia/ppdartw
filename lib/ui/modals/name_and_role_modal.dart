@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../shared/device_utils.dart';
 
-enum Role { jugador, espectador }
+import '../../domain/enums/role.dart';
+import '../../shared/device_utils.dart';
+import '../widgets/forms/custom_input_widget.dart';
 
 class NameAndRoleModal extends StatelessWidget {
   const NameAndRoleModal({
@@ -25,110 +26,98 @@ class NameAndRoleModal extends StatelessWidget {
     final bool isMobile =
         getDeviceType(MediaQuery.of(context).size.width) == DeviceType.mobile;
     final double modalWidth = isMobile ? 340 : 480;
-    final double modalHeight = isMobile ? 320 : 340;
+    final double maxModalHeight = MediaQuery.of(context).size.height * 0.9;
     return Center(
-      child: Container(
-        width: modalWidth,
-        height: modalHeight,
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1036),
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: Colors.purple.withValues(alpha: 0.5),
-              blurRadius: 32,
-              spreadRadius: 2,
-            ),
-          ],
-          border: Border.all(color: Colors.purpleAccent.shade100, width: 2),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const SizedBox(height: 8),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Tu nombre',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: modalWidth,
+            maxHeight: maxModalHeight,
+          ),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1036),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.purple.withValues(alpha: 0.5),
+                blurRadius: 32,
+                spreadRadius: 2,
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              onChanged: onNameChanged,
-              controller: TextEditingController(text: name),
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.transparent,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  borderSide: const BorderSide(
-                    color: Colors.purpleAccent,
-                    width: 2,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  borderSide: const BorderSide(
-                    color: Colors.purpleAccent,
-                    width: 2.5,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _RoleRadio(
-                  label: 'Jugador',
-                  value: Role.jugador,
-                  groupValue: selectedRole,
-                  onChanged: onRoleChanged,
-                ),
-                const SizedBox(width: 32),
-                _RoleRadio(
-                  label: 'Espectador',
-                  value: Role.espectador,
-                  groupValue: selectedRole,
-                  onChanged: onRoleChanged,
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: 180,
-              height: 44,
-              child: ElevatedButton(
-                onPressed: isContinueEnabled ? onContinue : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: 0.12),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  textStyle: const TextStyle(
+            ],
+            border: Border.all(color: Colors.purpleAccent.shade100, width: 2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const SizedBox(height: 8),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Tu nombre',
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
+                    color: Colors.white,
                   ),
-                  disabledBackgroundColor: Colors.white.withValues(alpha: 0.10),
-                  disabledForegroundColor: Colors.white.withValues(alpha: 0.54),
                 ),
-                child: const Text('Continuar'),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              CustomInputWidget(
+                label: 'Tu nombre',
+                value: name,
+                onChanged: onNameChanged,
+                hintText: 'Ingresa tu nombre',
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _RoleRadio(
+                    label: 'Jugador',
+                    value: Role.jugador,
+                    groupValue: selectedRole,
+                    onChanged: onRoleChanged,
+                  ),
+                  const SizedBox(width: 32),
+                  _RoleRadio(
+                    label: 'Espectador',
+                    value: Role.espectador,
+                    groupValue: selectedRole,
+                    onChanged: onRoleChanged,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: 180,
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: isContinueEnabled ? onContinue : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.12),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                    disabledBackgroundColor: Colors.white.withValues(
+                      alpha: 0.10,
+                    ),
+                    disabledForegroundColor: Colors.white.withValues(
+                      alpha: 0.54,
+                    ),
+                  ),
+                  child: const Text('Continuar'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

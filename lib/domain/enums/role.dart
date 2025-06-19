@@ -1,0 +1,1 @@
+enum Role { jugador, espectador }
