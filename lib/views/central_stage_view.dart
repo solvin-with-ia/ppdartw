@@ -35,10 +35,8 @@ class CentralStageView extends StatelessWidget {
           initialData: blocGame.selectedGame,
           builder:
               (BuildContext context, AsyncSnapshot<GameModel> gameSnapshot) {
-                final GameModel? game = gameSnapshot.data;
-                if (game == null) {
-                  return const Center(child: Text('No hay partida activa'));
-                }
+                final GameModel game = blocGame.selectedGame;
+
                 return Scaffold(
                   backgroundColor: theme.colorScheme.surface,
                   body: Stack(

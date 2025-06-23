@@ -4,10 +4,13 @@ import 'package:ppdartw/blocs/bloc_game.dart';
 import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
+import 'package:ppdartw/domains/models/card_model.dart';
 import 'package:ppdartw/domains/models/game_model.dart';
+import 'package:ppdartw/domains/models/vote_model.dart';
 import 'package:ppdartw/domains/repositories/game_repository.dart';
 import 'package:ppdartw/domains/repositories/session_repository.dart';
 import 'package:ppdartw/domains/usecases/game/create_game_usecase.dart';
+import 'package:ppdartw/domains/usecases/game/get_game_stream_usecase.dart';
 import 'package:ppdartw/domains/usecases/session/get_user_stream_usecase.dart';
 import 'package:ppdartw/domains/usecases/session/sign_in_with_google_usecase.dart';
 import 'package:ppdartw/domains/usecases/session/sign_out_usecase.dart';
@@ -139,9 +142,35 @@ class MockCreateGameUsecase implements CreateGameUsecase {
   GameRepository get repository => throw UnimplementedError();
 }
 
+class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
+  const DummyGetGameStreamUsecase();
+  @override
+  Stream<Either<ErrorItem, GameModel?>> call(String gameId) {
+    // Simula que el stream emite el GameModel esperado
+    final GameModel game = GameModel(
+      id: gameId,
+      name: 'Partida Test',
+      admin: const DummyUserModel(),
+      spectators: const <UserModel>[],
+      players: const <UserModel>[],
+      votes: const <VoteModel>[],
+      isActive: true,
+      createdAt: DateTime.now(),
+      deck: const <CardModel>[],
+    );
+    return Stream<Either<ErrorItem, GameModel?>>.value(
+      Right<ErrorItem, GameModel?>(game),
+    );
+  }
+
+  @override
+  GameRepository get repository => throw UnimplementedError();
+}
+
 void main() {
   group('BlocGame', () {
     late BlocGame blocGame;
+
     late MockBlocSession mockBlocSession;
     late MockCreateGameUsecase mockCreateGameUsecase;
     late BlocModal blocModal;
@@ -155,6 +184,7 @@ void main() {
       blocGame = BlocGame(
         blocSession: mockBlocSession,
         createGameUsecase: mockCreateGameUsecase,
+        getGameStreamUsecase: const DummyGetGameStreamUsecase(),
         blocModal: blocModal,
         blocNavigator: blocNavigator,
       );
@@ -167,6 +197,9 @@ void main() {
 
     test('createGame crea un nuevo GameModel con el admin logueado', () async {
       await blocGame.createGame(name: 'Partida Test');
+      await Future<void>.delayed(
+        Duration.zero,
+      ); // Espera a que el stream procese el valor
       final GameModel game = blocGame.selectedGame;
       expect(game.name, 'Partida Test');
       expect(game.admin.id, 'dummy');

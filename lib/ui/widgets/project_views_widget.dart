@@ -27,54 +27,58 @@ class ProjectViewsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final BlocModal? blocModal = AppStateManager.of(context).blocModal;
-    return Stack(
-      children: <Widget>[
-        StreamBuilder<EnumViews>(
-          stream: blocNavigator.viewStream,
-          initialData: blocNavigator.currentView,
-          builder: (BuildContext context, AsyncSnapshot<EnumViews> snapshot) {
-            final EnumViews view = blocNavigator.currentView;
-            switch (view) {
-              case EnumViews.splash:
-                return const SplashView();
-              case EnumViews.createGame:
-                return const CreateGameView();
-              case EnumViews.centralStage:
-                // Obtén el usuario y el juego actual del AppStateManager
-                final BlocGame blocGame = AppStateManager.of(context).blocGame;
-                final BlocSession blocSession = AppStateManager.of(
-                  context,
-                ).blocSession;
-                return CentralStageView(
-                  blocGame: blocGame,
-                  blocSession: blocSession,
-                );
-            }
-          },
-        ),
-        StreamBuilder<String>(
-          stream: blocLoading.msgStream,
-          initialData: blocLoading.msg,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-            final String msg = snapshot.data ?? '';
-            if (msg.isEmpty) {
-              return const SizedBox.shrink();
-            }
-            return LoadingWidget(loadingMsg: msg);
-          },
-        ),
-        if (blocModal != null)
-          StreamBuilder<Widget?>(
-            stream: blocModal.stream,
-            builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-              final Widget? modal = snapshot.data;
-              if (modal == null) {
-                return const SizedBox.shrink();
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          StreamBuilder<EnumViews>(
+            stream: blocNavigator.viewStream,
+            initialData: blocNavigator.currentView,
+            builder: (BuildContext context, AsyncSnapshot<EnumViews> snapshot) {
+              final EnumViews view = blocNavigator.currentView;
+              switch (view) {
+                case EnumViews.splash:
+                  return const SplashView();
+                case EnumViews.createGame:
+                  return const CreateGameView();
+                case EnumViews.centralStage:
+                  // Obtén el usuario y el juego actual del AppStateManager
+                  final BlocGame blocGame = AppStateManager.of(
+                    context,
+                  ).blocGame;
+                  final BlocSession blocSession = AppStateManager.of(
+                    context,
+                  ).blocSession;
+                  return CentralStageView(
+                    blocGame: blocGame,
+                    blocSession: blocSession,
+                  );
               }
-              return BackdropWidget(child: modal);
             },
           ),
-      ],
+          StreamBuilder<String>(
+            stream: blocLoading.msgStream,
+            initialData: blocLoading.msg,
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+              final String msg = snapshot.data ?? '';
+              if (msg.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return LoadingWidget(loadingMsg: msg);
+            },
+          ),
+          if (blocModal != null)
+            StreamBuilder<Widget?>(
+              stream: blocModal.stream,
+              builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+                final Widget? modal = snapshot.data;
+                if (modal == null) {
+                  return const SizedBox.shrink();
+                }
+                return BackdropWidget(child: modal);
+              },
+            ),
+        ],
+      ),
     );
   }
 }

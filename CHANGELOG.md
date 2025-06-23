@@ -1,3 +1,9 @@
+## 0.12.0
+
+- BlocGame ahora escucha en tiempo real el estado del juego usando GetGameStreamUsecase (stream reactivo).
+- Wiring e inyección de dependencias en main.dart para ServiceWsDatabase y GameRepository.
+- Adaptación de tests unitarios y mocks para soportar el nuevo parámetro getGameStreamUsecase.
+
 ## 0.11.0
 
 - PokerTableWidget ahora usa efectos de blur y glow realista en los tres óvalos, replicando el diseño de Figma:

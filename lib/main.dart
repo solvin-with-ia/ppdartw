@@ -9,7 +9,9 @@ import 'blocs/bloc_theme.dart';
 import 'domains/repositories/game_repository.dart';
 import 'domains/repositories/session_repository.dart';
 import 'domains/services/service_session.dart';
+import 'domains/services/service_ws_database.dart';
 import 'domains/usecases/game/create_game_usecase.dart';
+import 'domains/usecases/game/get_game_stream_usecase.dart';
 import 'domains/usecases/session/get_user_stream_usecase.dart';
 // Importa los usecases de sesión y juego
 import 'domains/usecases/session/sign_in_with_google_usecase.dart';
@@ -27,6 +29,7 @@ import 'ui/widgets/project_views_widget.dart';
 void main() {
   final BlocTheme blocTheme = BlocTheme();
   final ServiceSession serviceSession = FakeServiceSession();
+  final ServiceWsDatabase serviceWsDatabase = FakeServiceWsDatabase();
 
   final SessionRepository sessionRepository = SessionRepositoryImpl(
     SessionGatewayImpl(serviceSession),
@@ -40,6 +43,10 @@ void main() {
     sessionRepository,
   );
 
+  final GetGameStreamUsecase getGameStreamUsecase = GetGameStreamUsecase(
+    GameRepositoryImpl(GameGatewayImpl(serviceWsDatabase)),
+  );
+
   final BlocSession blocSession = BlocSession(
     signInWithGoogleUsecase: signInWithGoogleUsecase,
     signOutUsecase: signOutUsecase,
@@ -47,7 +54,7 @@ void main() {
   );
 
   // Instancia GameRepository y los usecases de juego
-  final GameGatewayImpl gameGateway = GameGatewayImpl(FakeServiceWsDatabase());
+  final GameGatewayImpl gameGateway = GameGatewayImpl(serviceWsDatabase);
   final GameRepository gameRepository = GameRepositoryImpl(gameGateway);
   final CreateGameUsecase createGameUsecase = CreateGameUsecase(gameRepository);
 
@@ -57,6 +64,7 @@ void main() {
     blocModal: blocModal,
     blocSession: blocSession,
     createGameUsecase: createGameUsecase,
+    getGameStreamUsecase: getGameStreamUsecase,
     blocNavigator: blocNavigator,
   );
 

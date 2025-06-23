@@ -11,6 +11,7 @@ import 'package:ppdartw/domains/models/game_model.dart';
 import 'package:ppdartw/domains/repositories/game_repository.dart';
 import 'package:ppdartw/domains/repositories/session_repository.dart';
 import 'package:ppdartw/domains/usecases/game/create_game_usecase.dart';
+import 'package:ppdartw/domains/usecases/game/get_game_stream_usecase.dart';
 import 'package:ppdartw/domains/usecases/session/get_user_stream_usecase.dart';
 import 'package:ppdartw/domains/usecases/session/sign_in_with_google_usecase.dart';
 import 'package:ppdartw/domains/usecases/session/sign_out_usecase.dart';
@@ -36,12 +37,24 @@ class DummyBlocSession extends BlocSession {
   );
 }
 
+class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
+  const DummyGetGameStreamUsecase();
+  @override
+  Stream<Either<ErrorItem, GameModel?>> call(String gameId) =>
+      const Stream<Either<ErrorItem, GameModel?>>.empty();
+  @override
+  GameRepository get repository => throw UnimplementedError();
+}
+
 class DummyBlocGame extends BlocGame {
-  DummyBlocGame({required super.blocModal, required super.blocNavigator})
-    : super(
-        blocSession: DummyBlocSession(),
-        createGameUsecase: DummyCreateGameUsecase(),
-      );
+  DummyBlocGame({
+    required super.blocModal,
+    required super.blocNavigator,
+    required super.getGameStreamUsecase,
+  }) : super(
+         blocSession: DummyBlocSession(),
+         createGameUsecase: DummyCreateGameUsecase(),
+       );
 
   @override
   Future<void> init() async {
@@ -122,6 +135,7 @@ void main() {
     final DummyBlocGame blocGame = DummyBlocGame(
       blocModal: blocModal,
       blocNavigator: blocNavigator,
+      getGameStreamUsecase: const DummyGetGameStreamUsecase(),
     );
     await tester.pumpWidget(
       AppStateManager(

@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
 import '../domain/enums/role.dart';
-import '../domains/models/card_model.dart';
 import '../domains/models/game_model.dart';
 import '../domains/models/vote_model.dart';
 import '../domains/usecases/game/create_game_usecase.dart';
+import '../domains/usecases/game/get_game_stream_usecase.dart';
+import '../shared/deck.dart';
 import '../views/enum_views.dart';
 import 'bloc_modal.dart';
 import 'bloc_navigator.dart';
@@ -17,12 +18,15 @@ class BlocGame {
   BlocGame({
     required this.blocSession,
     required this.createGameUsecase,
+    required this.getGameStreamUsecase,
     required this.blocModal,
     required this.blocNavigator,
   }) {
     init();
   }
 
+  final GetGameStreamUsecase getGameStreamUsecase;
+  StreamSubscription<Either<ErrorItem, GameModel?>>? _gameSubscription;
   final BlocNavigator blocNavigator;
 
   Future<void> init() async {
@@ -77,17 +81,29 @@ class BlocGame {
       votes: const <VoteModel>[],
       isActive: true,
       createdAt: DateTime.now(),
-      deck: const <CardModel>[],
+      deck: defaultPlanningPokerDeck,
     );
-    final Either<ErrorItem, void> result = await createGameUsecase.call(game);
-    result.fold(
-      (ErrorItem error) {
-        // Manejo de error opcional
-      },
-      (_) {
-        _gameBloc.value = game;
-      },
-    );
+    await createGameUsecase.call(game);
+    _subscribeToGame(game.id);
+  }
+
+  /// Suscribe el bloc al stream de un juego específico y actualiza el estado reactivo.
+  void _subscribeToGame(String gameId) {
+    _gameSubscription?.cancel();
+    _gameSubscription = getGameStreamUsecase(gameId).listen((
+      Either<ErrorItem, GameModel?> either,
+    ) {
+      either.fold(
+        (ErrorItem error) {
+          // Aquí puedes manejar errores de stream en el futuro.
+        },
+        (GameModel? game) {
+          if (game != null) {
+            _gameBloc.value = game;
+          }
+        },
+      );
+    });
   }
 
   Role? get selectedRole => _gameBloc.value.role;
@@ -101,6 +117,7 @@ class BlocGame {
   }
 
   void dispose() {
+    _gameSubscription?.cancel();
     _gameBloc.dispose();
   }
 
