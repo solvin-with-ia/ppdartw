@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-import '../../domain/enums/role.dart';
+import '../enums/role.dart';
 import 'card_model.dart';
 import 'model_utils.dart';
 import 'vote_model.dart';

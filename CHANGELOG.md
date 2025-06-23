@@ -1,3 +1,9 @@
+## 0.14.0
+
+- Limpieza mayor de archivos legacy bajo lib/domains/ (modelos, gateways, servicios y usecases eliminados).
+- El dominio ahora está centralizado en lib/domain/ y se apoya en jocaagura_domain para modelos y lógica compartida.
+- Simplificación de la estructura del proyecto, menos duplicidad y mayor mantenibilidad.
+
 ## 0.13.0
 
 - Nuevo widget DeckWidget: deck de cartas siempre centrado, con título y altura fija, evitando overflow y alineado a Figma.
