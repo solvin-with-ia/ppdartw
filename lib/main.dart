@@ -52,13 +52,14 @@ void main() {
   final CreateGameUsecase createGameUsecase = CreateGameUsecase(gameRepository);
 
   final BlocModal blocModal = BlocModal();
+  final BlocNavigator blocNavigator = BlocNavigator(blocSession);
   final BlocGame blocGame = BlocGame(
     blocModal: blocModal,
     blocSession: blocSession,
     createGameUsecase: createGameUsecase,
+    blocNavigator: blocNavigator,
   );
 
-  final BlocNavigator blocNavigator = BlocNavigator(blocSession);
   final BlocLoading blocLoading = BlocLoading();
 
   runApp(

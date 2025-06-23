@@ -10,16 +10,17 @@ class NameAndRoleModal extends StatelessWidget {
     required this.selectedRole,
     required this.onNameChanged,
     required this.onRoleChanged,
-    required this.onContinue,
-    required this.isContinueEnabled,
     super.key,
+    this.onContinue,
+    this.onClose,
   });
+
   final String name;
   final Role? selectedRole;
   final ValueChanged<String> onNameChanged;
   final ValueChanged<Role> onRoleChanged;
-  final VoidCallback onContinue;
-  final bool isContinueEnabled;
+  final VoidCallback? onContinue;
+  final VoidCallback? onClose;
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +95,7 @@ class NameAndRoleModal extends StatelessWidget {
                 width: 180,
                 height: 44,
                 child: ElevatedButton(
-                  onPressed: isContinueEnabled ? onContinue : null,
+                  onPressed: onContinue,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white.withValues(alpha: 0.12),
                     foregroundColor: Colors.white,

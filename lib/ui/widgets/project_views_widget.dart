@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../blocs/bloc_game.dart';
+
 /// Widget que reacciona al stream de BlocNavigator y muestra la vista correspondiente.
 import '../../blocs/bloc_loading.dart';
 import '../../blocs/bloc_modal.dart';
 import '../../blocs/bloc_navigator.dart';
+import '../../blocs/bloc_session.dart';
 import '../../shared/app_state_manager.dart';
+import '../../views/central_stage_view.dart';
 import '../../views/create_game_view.dart';
 import '../../views/enum_views.dart';
 import '../../views/splash_view.dart';
@@ -35,6 +39,16 @@ class ProjectViewsWidget extends StatelessWidget {
                 return const SplashView();
               case EnumViews.createGame:
                 return const CreateGameView();
+              case EnumViews.centralStage:
+                // Obtén el usuario y el juego actual del AppStateManager
+                final BlocGame blocGame = AppStateManager.of(context).blocGame;
+                final BlocSession blocSession = AppStateManager.of(
+                  context,
+                ).blocSession;
+                return CentralStageView(
+                  blocGame: blocGame,
+                  blocSession: blocSession,
+                );
             }
           },
         ),

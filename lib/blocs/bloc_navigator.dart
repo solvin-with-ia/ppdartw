@@ -46,8 +46,8 @@ class BlocNavigator {
         return true;
       case EnumViews.createGame:
         return false;
-      // case EnumViews.home:
-      //   return true;
+      case EnumViews.centralStage:
+        return true;
     }
   }
 

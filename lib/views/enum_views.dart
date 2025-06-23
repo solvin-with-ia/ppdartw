@@ -2,4 +2,5 @@
 enum EnumViews {
   splash,
   createGame,
+  centralStage,
 }

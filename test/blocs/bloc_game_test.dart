@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
 import 'package:ppdartw/blocs/bloc_modal.dart';
+import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
 import 'package:ppdartw/domains/models/game_model.dart';
 import 'package:ppdartw/domains/repositories/game_repository.dart';
@@ -144,15 +145,18 @@ void main() {
     late MockBlocSession mockBlocSession;
     late MockCreateGameUsecase mockCreateGameUsecase;
     late BlocModal blocModal;
+    late BlocNavigator blocNavigator;
 
     setUp(() {
       mockBlocSession = MockBlocSession();
       mockCreateGameUsecase = MockCreateGameUsecase();
       blocModal = BlocModal(); // Instancia mínima
+      blocNavigator = BlocNavigator(mockBlocSession);
       blocGame = BlocGame(
         blocSession: mockBlocSession,
         createGameUsecase: mockCreateGameUsecase,
         blocModal: blocModal,
+        blocNavigator: blocNavigator,
       );
     });
 

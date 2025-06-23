@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../blocs/bloc_game.dart';
+import '../blocs/bloc_navigator.dart';
+import '../blocs/bloc_session.dart';
 import '../domains/models/game_model.dart';
 import '../shared/app_state_manager.dart';
 import '../shared/device_utils.dart';
@@ -9,6 +11,7 @@ import '../ui/widgets/button_widget.dart';
 import '../ui/widgets/forms/custom_input_widget.dart';
 import '../ui/widgets/logo_horizontal_widget.dart';
 import '../ui/widgets/projector_widget.dart';
+import 'enum_views.dart';
 
 class CreateGameView extends StatelessWidget {
   const CreateGameView({super.key});
@@ -78,18 +81,49 @@ class CreateGameView extends StatelessWidget {
                                                   final GameModel game =
                                                       snapshot.data ??
                                                       GameModel.empty();
+                                                  AppStateManager.of(
+                                                    context,
+                                                  ).blocNavigator.goTo(
+                                                    EnumViews.centralStage,
+                                                  );
+                                                  final BlocSession
+                                                  blocSession =
+                                                      AppStateManager.of(
+                                                        context,
+                                                      ).blocSession;
                                                   return NameAndRoleModal(
-                                                    name: game.name,
+                                                    name:
+                                                        blocSession
+                                                            .user
+                                                            ?.displayName ??
+                                                        '',
                                                     selectedRole: game.role,
                                                     onNameChanged:
                                                         blocGame.updateGameName,
                                                     onRoleChanged:
                                                         blocGame.updateGameRole,
-                                                    onContinue: () => blocGame
-                                                        .blocModal
-                                                        .hideModal(),
-                                                    isContinueEnabled:
-                                                        blocGame.isNameValid,
+                                                    onClose: () {
+                                                      final BlocNavigator
+                                                      blocNavigator =
+                                                          AppStateManager.of(
+                                                            context,
+                                                          ).blocNavigator;
+                                                      blocNavigator.goTo(
+                                                        EnumViews.centralStage,
+                                                      );
+                                                    },
+                                                    onContinue: () {
+                                                      final BlocNavigator
+                                                      blocNavigator =
+                                                          AppStateManager.of(
+                                                            context,
+                                                          ).blocNavigator;
+                                                      blocNavigator.goTo(
+                                                        EnumViews.centralStage,
+                                                      );
+                                                      blocGame.blocModal
+                                                          .hideModal();
+                                                    },
                                                   );
                                                 },
                                           ),

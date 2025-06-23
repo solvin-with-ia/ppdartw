@@ -1,3 +1,9 @@
+## 0.10.0
+
+- Refactor: BlocGame ahora inicializa la sesión automáticamente y centraliza la navegación inicial.
+- El flujo de navegación y sesión es totalmente reactivo y preparado para escalar.
+- Limpieza de prints y robustez en la inicialización.
+
 ## 0.9.0
 
 - Refactor completo de NameAndRoleModal: ahora es 100% stateless y reactivo, sin estado local.

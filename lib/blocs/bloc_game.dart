@@ -7,7 +7,9 @@ import '../domains/models/card_model.dart';
 import '../domains/models/game_model.dart';
 import '../domains/models/vote_model.dart';
 import '../domains/usecases/game/create_game_usecase.dart';
+import '../views/enum_views.dart';
 import 'bloc_modal.dart';
+import 'bloc_navigator.dart';
 import 'bloc_session.dart';
 
 /// Bloc para manejar la lógica de creación y estado de la partida actual.
@@ -16,7 +18,35 @@ class BlocGame {
     required this.blocSession,
     required this.createGameUsecase,
     required this.blocModal,
-  });
+    required this.blocNavigator,
+  }) {
+    init();
+  }
+
+  final BlocNavigator blocNavigator;
+
+  Future<void> init() async {
+    await Future<void>.delayed(const Duration(seconds: 3));
+    await blocSession.signInWithGoogleUsecase.call();
+    blocNavigator.goTo(EnumViews.createGame);
+    // Navegación reactiva según el estado del juego
+    _gameBloc.addFunctionToProcessTValueOnStream('navigateOnGameChange', (
+      GameModel game,
+    ) {
+      // Ejemplo: si el juego está creado y el usuario está autenticado, navega a la mesa central
+      final UserModel? user = blocSession.user;
+      if (user != null && game.id.isNotEmpty) {
+        blocNavigator.goTo(EnumViews.centralStage);
+      }
+    });
+
+    // También puedes agregar lógica reactiva para el usuario si lo deseas
+    blocSession.userStream.listen((UserModel? user) {
+      if (user == null) {
+        blocNavigator.goTo(EnumViews.splash);
+      }
+    });
+  }
 
   final BlocModal blocModal;
   final BlocSession blocSession;
