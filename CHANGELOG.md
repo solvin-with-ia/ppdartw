@@ -1,3 +1,10 @@
+## 0.11.0
+
+- PokerTableWidget ahora usa efectos de blur y glow realista en los tres óvalos, replicando el diseño de Figma:
+  - Blur y color parametrizados por tema.
+  - Soporte para inner y outer blur en cada óvalo.
+  - Efecto neón más fiel y profesional.
+
 ## 0.10.0
 
 - Refactor: BlocGame ahora inicializa la sesión automáticamente y centraliza la navegación inicial.

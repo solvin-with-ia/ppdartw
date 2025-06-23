@@ -42,6 +42,11 @@ class DummyBlocGame extends BlocGame {
         blocSession: DummyBlocSession(),
         createGameUsecase: DummyCreateGameUsecase(),
       );
+
+  @override
+  Future<void> init() async {
+    // Evita timers y lógica asíncrona en tests
+  }
 }
 
 class DummyCreateGameUsecase extends CreateGameUsecase {

@@ -43,22 +43,6 @@ class CentralStageView extends StatelessWidget {
                   backgroundColor: theme.colorScheme.surface,
                   body: Stack(
                     children: <Widget>[
-                      // Fondo principal
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                            radius: 1.1,
-                            colors: <Color>[
-                              Colors.deepPurple.shade900,
-                              theme.colorScheme.secondary.withValues(
-                                alpha: 0.12,
-                              ),
-                              Colors.black,
-                            ],
-                            stops: const <double>[0.6, 0.95, 1.0],
-                          ),
-                        ),
-                      ),
                       // Layout principal
                       SafeArea(
                         child: Column(
