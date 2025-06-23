@@ -35,7 +35,7 @@ class CardModelWidget extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          '${card.value}',
+          card.display,
           style: theme.textTheme.displayMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.bold,

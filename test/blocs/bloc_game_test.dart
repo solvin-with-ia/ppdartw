@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
@@ -143,24 +144,39 @@ class MockCreateGameUsecase implements CreateGameUsecase {
 }
 
 class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
-  const DummyGetGameStreamUsecase();
+  DummyGetGameStreamUsecase();
+  final Map<String, StreamController<Either<ErrorItem, GameModel?>>>
+  _controllers = <String, StreamController<Either<ErrorItem, GameModel?>>>{};
+
+  void setGame(GameModel game) {
+    final String gameId = game.id;
+    if (!_controllers.containsKey(gameId)) {
+      _controllers[gameId] =
+          StreamController<Either<ErrorItem, GameModel?>>.broadcast();
+    }
+    _controllers[gameId]!.add(Right<ErrorItem, GameModel?>(game));
+  }
+
   @override
   Stream<Either<ErrorItem, GameModel?>> call(String gameId) {
-    // Simula que el stream emite el GameModel esperado
-    final GameModel game = GameModel(
-      id: gameId,
-      name: 'Partida Test',
-      admin: const DummyUserModel(),
-      spectators: const <UserModel>[],
-      players: const <UserModel>[],
-      votes: const <VoteModel>[],
-      isActive: true,
-      createdAt: DateTime.now(),
-      deck: const <CardModel>[],
-    );
-    return Stream<Either<ErrorItem, GameModel?>>.value(
-      Right<ErrorItem, GameModel?>(game),
-    );
+    if (!_controllers.containsKey(gameId)) {
+      _controllers[gameId] =
+          StreamController<Either<ErrorItem, GameModel?>>.broadcast();
+      // Emitir un valor inicial
+      final GameModel game = GameModel(
+        id: gameId,
+        name: 'Partida Test',
+        admin: const DummyUserModel(),
+        spectators: const <UserModel>[],
+        players: const <UserModel>[],
+        votes: const <VoteModel>[],
+        isActive: true,
+        createdAt: DateTime.now(),
+        deck: const <CardModel>[],
+      );
+      _controllers[gameId]!.add(Right<ErrorItem, GameModel?>(game));
+    }
+    return _controllers[gameId]!.stream;
   }
 
   @override
@@ -175,16 +191,18 @@ void main() {
     late MockCreateGameUsecase mockCreateGameUsecase;
     late BlocModal blocModal;
     late BlocNavigator blocNavigator;
+    late DummyGetGameStreamUsecase dummyGetGameStreamUsecase;
 
     setUp(() {
       mockBlocSession = MockBlocSession();
       mockCreateGameUsecase = MockCreateGameUsecase();
       blocModal = BlocModal(); // Instancia mínima
       blocNavigator = BlocNavigator(mockBlocSession);
+      dummyGetGameStreamUsecase = DummyGetGameStreamUsecase();
       blocGame = BlocGame(
         blocSession: mockBlocSession,
         createGameUsecase: mockCreateGameUsecase,
-        getGameStreamUsecase: const DummyGetGameStreamUsecase(),
+        getGameStreamUsecase: dummyGetGameStreamUsecase,
         blocModal: blocModal,
         blocNavigator: blocNavigator,
       );
@@ -210,6 +228,25 @@ void main() {
       blocGame.createGame(name: 'Partida Test');
       blocGame.updateGameName('Nuevo Nombre');
       expect(blocGame.selectedGame.name, 'Nuevo Nombre');
+    });
+
+    test('updateGame persiste y mantiene el draft actualizado', () async {
+      await blocGame.createGame(name: 'Partida Persistida');
+      final String oldId = blocGame.selectedGame.id;
+      blocGame.updateGameName('Nombre Actualizado');
+      // Simula que el backend persiste el modelo actualizado
+      dummyGetGameStreamUsecase.setGame(blocGame.selectedGame);
+      await blocGame.updateGame();
+      // Espera a que el stream procese el valor
+      await Future<void>.delayed(Duration.zero);
+      expect(blocGame.selectedGame.name, 'Nombre Actualizado');
+      expect(blocGame.selectedGame.id, oldId);
+    });
+
+    test('updateGame no lanza errores si se llama sin cambios', () async {
+      await blocGame.createGame(name: 'Partida Simple');
+      await Future<void>.delayed(Duration.zero);
+      expect(() => blocGame.updateGame(), returnsNormally);
     });
 
     test('dispose no lanza errores', () {

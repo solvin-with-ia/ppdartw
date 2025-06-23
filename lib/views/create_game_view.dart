@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../blocs/bloc_game.dart';
-import '../blocs/bloc_navigator.dart';
-import '../blocs/bloc_session.dart';
 import '../domains/models/game_model.dart';
 import '../shared/app_state_manager.dart';
 import '../shared/device_utils.dart';
-import '../ui/modals/name_and_role_modal.dart';
 import '../ui/widgets/button_widget.dart';
 import '../ui/widgets/forms/custom_input_widget.dart';
 import '../ui/widgets/logo_horizontal_widget.dart';
 import '../ui/widgets/projector_widget.dart';
-import 'enum_views.dart';
 
 class CreateGameView extends StatelessWidget {
   const CreateGameView({super.key});
@@ -66,70 +62,11 @@ class CreateGameView extends StatelessWidget {
                               return ButtonWidget(
                                 label: 'Crear partida',
                                 enabled: blocGame.isNameValid,
-                                onTap: blocGame.isNameValid
-                                    ? () {
-                                        blocGame.blocModal.showModal(
-                                          StreamBuilder<GameModel>(
-                                            stream: blocGame.gameStream,
-                                            initialData: blocGame.selectedGame,
-                                            builder:
-                                                (
-                                                  BuildContext context,
-                                                  AsyncSnapshot<GameModel>
-                                                  snapshot,
-                                                ) {
-                                                  final GameModel game =
-                                                      snapshot.data ??
-                                                      GameModel.empty();
-                                                  AppStateManager.of(
-                                                    context,
-                                                  ).blocNavigator.goTo(
-                                                    EnumViews.centralStage,
-                                                  );
-                                                  final BlocSession
-                                                  blocSession =
-                                                      AppStateManager.of(
-                                                        context,
-                                                      ).blocSession;
-                                                  return NameAndRoleModal(
-                                                    name:
-                                                        blocSession
-                                                            .user
-                                                            ?.displayName ??
-                                                        '',
-                                                    selectedRole: game.role,
-                                                    onNameChanged:
-                                                        blocGame.updateGameName,
-                                                    onRoleChanged:
-                                                        blocGame.updateGameRole,
-                                                    onClose: () {
-                                                      final BlocNavigator
-                                                      blocNavigator =
-                                                          AppStateManager.of(
-                                                            context,
-                                                          ).blocNavigator;
-                                                      blocNavigator.goTo(
-                                                        EnumViews.centralStage,
-                                                      );
-                                                    },
-                                                    onContinue: () {
-                                                      final BlocNavigator
-                                                      blocNavigator =
-                                                          AppStateManager.of(
-                                                            context,
-                                                          ).blocNavigator;
-                                                      blocNavigator.goTo(
-                                                        EnumViews.centralStage,
-                                                      );
-                                                      blocGame.blocModal
-                                                          .hideModal();
-                                                    },
-                                                  );
-                                                },
-                                          ),
-                                        );
-                                      }
-                                    : () {},
+                                onTap: () {
+                                  blocGame.createGame(
+                                    name: blocGame.selectedGame.name,
+                                  );
+                                },
                               );
                             },
                       ),

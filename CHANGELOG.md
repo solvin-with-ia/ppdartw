@@ -1,3 +1,11 @@
+## 0.13.0
+
+- Nuevo widget DeckWidget: deck de cartas siempre centrado, con título y altura fija, evitando overflow y alineado a Figma.
+- CardModelWidget ahora muestra el display (texto o emoji), permitiendo visualizar correctamente el '?' y la taza.
+- Refactor visual en CentralStageView: deck extraído a widget, layout y UX mejorados.
+- Limpieza de imports y código legacy en vistas y widgets.
+- MVP listo para demo final.
+
 ## 0.12.0
 
 - BlocGame ahora escucha en tiempo real el estado del juego usando GetGameStreamUsecase (stream reactivo).

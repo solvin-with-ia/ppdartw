@@ -115,23 +115,21 @@ class GameModel {
   final List<CardModel> deck;
   final int? revealTimeout;
 
-  Map<String, dynamic> toJson() => <String, dynamic>{
-    'id': id,
-    'name': name,
-    'admin': admin.toJson(),
-    'spectators': modelListToJson<UserModel>(
-      spectators,
-      (UserModel u) => u.toJson(),
-    ),
-    'players': modelListToJson<UserModel>(players, (UserModel u) => u.toJson()),
-    'votes': modelListToJson<VoteModel>(votes, (VoteModel v) => v.toJson()),
-    'isActive': isActive,
-    'createdAt': createdAt.toIso8601String(),
-    'finishedAt': finishedAt?.toIso8601String(),
-    'currentStory': currentStory,
-    'stories': stories,
-
-    'deck': modelListToJson<CardModel>(deck, (CardModel c) => c.toJson()),
-    'revealTimeout': revealTimeout,
-  };
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'admin': admin.toJson(),
+      'spectators': spectators.map((UserModel u) => u.toJson()).toList(),
+      'players': players.map((UserModel u) => u.toJson()).toList(),
+      'votes': votes.map((VoteModel v) => v.toJson()).toList(),
+      'isActive': isActive,
+      'createdAt': createdAt.toIso8601String(),
+      'finishedAt': finishedAt?.toIso8601String(),
+      'currentStory': currentStory,
+      'stories': stories,
+      'deck': deck.map((CardModel c) => c.toJson()).toList(),
+      'revealTimeout': revealTimeout,
+    };
+  }
 }

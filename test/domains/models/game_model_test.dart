@@ -54,6 +54,69 @@ void main() {
   });
 
   group('GameModel', () {
+    test('fromJson y toJson roundtrip con deck no vacío', () {
+      final List<CardModel> deck = <CardModel>[
+        const CardModel(
+          id: 'fib_1',
+          display: '1',
+          value: 1,
+          description: 'desc',
+        ),
+        const CardModel(
+          id: 'fib_2',
+          display: '2',
+          value: 2,
+          description: 'desc',
+        ),
+      ];
+      final GameModel model = GameModel(
+        id: 'g1',
+        name: 'Partida',
+        admin: const UserModel(
+          id: 'u',
+          displayName: 'a',
+          photoUrl: '',
+          email: '',
+          jwt: <String, dynamic>{},
+        ),
+        spectators: const <UserModel>[],
+        players: const <UserModel>[],
+        votes: const <VoteModel>[],
+        isActive: true,
+        createdAt: DateTime(2025),
+        deck: deck,
+      );
+      final Map<String, dynamic> json = model.toJson();
+      final GameModel model2 = GameModel.fromJson(json);
+      expect(model2.deck, equals(deck));
+      expect(
+        model2.toJson()['deck'],
+        equals(deck.map((CardModel c) => c.toJson()).toList()),
+      );
+    });
+    test('fromJson y toJson roundtrip con deck vacío', () {
+      final GameModel model = GameModel(
+        id: 'g2',
+        name: 'Vacía',
+        admin: const UserModel(
+          id: 'u',
+          displayName: 'a',
+          photoUrl: '',
+          email: '',
+          jwt: <String, dynamic>{},
+        ),
+        spectators: const <UserModel>[],
+        players: const <UserModel>[],
+        votes: const <VoteModel>[],
+        isActive: false,
+        createdAt: DateTime(2025),
+        deck: const <CardModel>[],
+      );
+      final Map<String, dynamic> json = model.toJson();
+      final GameModel model2 = GameModel.fromJson(json);
+      expect(model2.deck, isEmpty);
+      expect(model2.toJson()['deck'], isEmpty);
+    });
     const UserModel user1 = UserModel(
       id: 'user1',
       displayName: 'Alice',
