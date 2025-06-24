@@ -1,5 +1,5 @@
-import '../../domains/gateways/game_gateway.dart';
-import '../../domains/services/service_ws_database.dart';
+import '../../domain/gateways/game_gateway.dart';
+import '../../domain/services/service_ws_database.dart';
 
 class GameGatewayImpl implements GameGateway {
   GameGatewayImpl(this.db);

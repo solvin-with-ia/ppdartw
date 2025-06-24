@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ppdartw/domains/gateways/session_gateway.dart';
+import 'package:ppdartw/domain/gateways/session_gateway.dart';
 import 'package:ppdartw/infrastructure/gateways/session_gateway_impl.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_session.dart';
 

@@ -3,7 +3,7 @@ import 'package:jocaagura_domain/jocaagura_domain.dart';
 
 import '../blocs/bloc_game.dart';
 import '../blocs/bloc_session.dart';
-import '../domains/models/game_model.dart';
+import '../domain/models/game_model.dart';
 import '../ui/widgets/button_widget.dart';
 import '../ui/widgets/deck_widget.dart';
 import '../ui/widgets/logo_horizontal_widget.dart';

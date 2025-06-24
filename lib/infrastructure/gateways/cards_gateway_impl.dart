@@ -1,5 +1,5 @@
-import '../../domains/gateways/cards_gateway.dart';
-import '../../domains/services/service_ws_database.dart';
+import '../../domain/gateways/cards_gateway.dart';
+import '../../domain/services/service_ws_database.dart';
 
 class CardsGatewayImpl implements CardsGateway {
   CardsGatewayImpl(this.db);

@@ -1,6 +1,6 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import '../../domains/gateways/session_gateway.dart';
-import '../../domains/repositories/session_repository.dart';
+import '../../domain/gateways/session_gateway.dart';
+import '../../domain/repositories/session_repository.dart';
 
 class SessionRepositoryImpl implements SessionRepository {
   const SessionRepositoryImpl(this.gateway);

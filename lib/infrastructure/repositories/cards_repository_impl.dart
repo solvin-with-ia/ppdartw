@@ -1,6 +1,6 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import '../../domains/models/card_model.dart';
-import '../../domains/repositories/cards_repository.dart';
+import '../../domain/models/card_model.dart';
+import '../../domain/repositories/cards_repository.dart';
 
 import '../gateways/cards_gateway_impl.dart';
 

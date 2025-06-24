@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import 'package:ppdartw/domains/models/card_model.dart';
+import 'package:ppdartw/domain/models/card_model.dart';
 import 'package:ppdartw/infrastructure/gateways/cards_gateway_impl.dart';
 import 'package:ppdartw/infrastructure/repositories/cards_repository_impl.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_ws_database.dart';

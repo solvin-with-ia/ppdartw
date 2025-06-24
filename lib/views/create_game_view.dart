@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../blocs/bloc_game.dart';
-import '../domains/models/game_model.dart';
+import '../domain/models/game_model.dart';
 import '../shared/app_state_manager.dart';
 import '../shared/device_utils.dart';
 import '../ui/widgets/button_widget.dart';

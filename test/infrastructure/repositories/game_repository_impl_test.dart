@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import 'package:ppdartw/domains/models/card_model.dart';
-import 'package:ppdartw/domains/models/game_model.dart';
-import 'package:ppdartw/domains/models/vote_model.dart';
+import 'package:ppdartw/domain/models/card_model.dart';
+import 'package:ppdartw/domain/models/game_model.dart';
+import 'package:ppdartw/domain/models/vote_model.dart';
 import 'package:ppdartw/infrastructure/gateways/game_gateway_impl.dart';
 import 'package:ppdartw/infrastructure/repositories/game_repository_impl.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_ws_database.dart';

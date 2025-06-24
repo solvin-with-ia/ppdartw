@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import '../../domains/services/service_ws_database.dart';
+import '../../domain/services/service_ws_database.dart';
 
 /// FakeServiceWsDatabase simula un backend en memoria para pruebas y desarrollo.
 /// No tiene persistencia: todos los datos se pierden al reiniciar la app.

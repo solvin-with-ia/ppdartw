@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
 import '../domain/enums/role.dart';
-import '../domains/models/game_model.dart';
-import '../domains/models/vote_model.dart';
-import '../domains/usecases/game/create_game_usecase.dart';
-import '../domains/usecases/game/get_game_stream_usecase.dart';
+import '../domain/models/game_model.dart';
+import '../domain/models/vote_model.dart';
+import '../domain/usecases/game/create_game_usecase.dart';
+import '../domain/usecases/game/get_game_stream_usecase.dart';
 import '../shared/deck.dart';
 import '../views/enum_views.dart';
 import 'bloc_modal.dart';

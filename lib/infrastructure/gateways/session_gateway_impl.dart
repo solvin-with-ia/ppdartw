@@ -1,7 +1,7 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-import '../../domains/gateways/session_gateway.dart';
-import '../../domains/services/service_session.dart';
+import '../../domain/gateways/session_gateway.dart';
+import '../../domain/services/service_session.dart';
 
 class SessionGatewayImpl implements SessionGateway {
   SessionGatewayImpl(this.session);

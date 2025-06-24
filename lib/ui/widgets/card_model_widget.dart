@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domains/models/card_model.dart';
+import '../../domain/models/card_model.dart';
 
 class CardModelWidget extends StatelessWidget {
   const CardModelWidget({

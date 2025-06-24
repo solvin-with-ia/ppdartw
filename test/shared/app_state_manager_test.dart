@@ -7,14 +7,14 @@ import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
 import 'package:ppdartw/blocs/bloc_theme.dart';
-import 'package:ppdartw/domains/models/game_model.dart';
-import 'package:ppdartw/domains/repositories/game_repository.dart';
-import 'package:ppdartw/domains/repositories/session_repository.dart';
-import 'package:ppdartw/domains/usecases/game/create_game_usecase.dart';
-import 'package:ppdartw/domains/usecases/game/get_game_stream_usecase.dart';
-import 'package:ppdartw/domains/usecases/session/get_user_stream_usecase.dart';
-import 'package:ppdartw/domains/usecases/session/sign_in_with_google_usecase.dart';
-import 'package:ppdartw/domains/usecases/session/sign_out_usecase.dart';
+import 'package:ppdartw/domain/models/game_model.dart';
+import 'package:ppdartw/domain/repositories/game_repository.dart';
+import 'package:ppdartw/domain/repositories/session_repository.dart';
+import 'package:ppdartw/domain/usecases/game/create_game_usecase.dart';
+import 'package:ppdartw/domain/usecases/game/get_game_stream_usecase.dart';
+import 'package:ppdartw/domain/usecases/session/get_user_stream_usecase.dart';
+import 'package:ppdartw/domain/usecases/session/sign_in_with_google_usecase.dart';
+import 'package:ppdartw/domain/usecases/session/sign_out_usecase.dart';
 import 'package:ppdartw/shared/app_state_manager.dart';
 
 class DummyBlocSession extends BlocSession {

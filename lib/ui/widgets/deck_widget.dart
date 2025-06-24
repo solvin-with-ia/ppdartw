@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:text_responsive/text_responsive.dart';
-import '../../domains/models/card_model.dart';
+import '../../domain/models/card_model.dart';
 import 'card_model_widget.dart';
 
 class DeckWidget extends StatelessWidget {

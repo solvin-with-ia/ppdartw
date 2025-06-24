@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-import '../domains/usecases/session/get_user_stream_usecase.dart';
-import '../domains/usecases/session/sign_in_with_google_usecase.dart';
-import '../domains/usecases/session/sign_out_usecase.dart';
+import '../domain/usecases/session/get_user_stream_usecase.dart';
+import '../domain/usecases/session/sign_in_with_google_usecase.dart';
+import '../domain/usecases/session/sign_out_usecase.dart';
 
 /// Bloc para manejar la sesión del usuario.
 class BlocSession {

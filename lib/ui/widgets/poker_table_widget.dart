@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domains/models/game_model.dart';
+import '../../domain/models/game_model.dart';
 
 class PokerTableWidget extends StatelessWidget {
   const PokerTableWidget({required this.game, this.child, super.key});

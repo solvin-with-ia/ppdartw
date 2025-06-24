@@ -1,5 +1,5 @@
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import '../../domains/services/service_session.dart';
+import '../../domain/services/service_session.dart';
 
 /// FakeServiceSession simula autenticación controlada para desarrollo/testing.
 class FakeServiceSession implements ServiceSession {

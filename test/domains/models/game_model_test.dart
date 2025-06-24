@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
-import 'package:ppdartw/domains/models/card_model.dart';
-import 'package:ppdartw/domains/models/game_model.dart';
-import 'package:ppdartw/domains/models/model_utils.dart';
-import 'package:ppdartw/domains/models/vote_model.dart';
+import 'package:ppdartw/domain/models/card_model.dart';
+import 'package:ppdartw/domain/models/game_model.dart';
+import 'package:ppdartw/domain/models/model_utils.dart';
+import 'package:ppdartw/domain/models/vote_model.dart';
 
 void main() {
   group('CardModel', () {

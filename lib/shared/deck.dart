@@ -1,4 +1,4 @@
-import '../domains/models/card_model.dart';
+import '../domain/models/card_model.dart';
 
 /// Baraja Planning Poker por defecto (Fibonacci + comodines)
 final List<CardModel> defaultPlanningPokerDeck = <CardModel>[

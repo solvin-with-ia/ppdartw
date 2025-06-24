@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
-import 'package:ppdartw/domains/repositories/session_repository.dart';
-import 'package:ppdartw/domains/usecases/session/get_user_stream_usecase.dart';
-import 'package:ppdartw/domains/usecases/session/sign_in_with_google_usecase.dart';
-import 'package:ppdartw/domains/usecases/session/sign_out_usecase.dart';
+import 'package:ppdartw/domain/repositories/session_repository.dart';
+import 'package:ppdartw/domain/usecases/session/get_user_stream_usecase.dart';
+import 'package:ppdartw/domain/usecases/session/sign_in_with_google_usecase.dart';
+import 'package:ppdartw/domain/usecases/session/sign_out_usecase.dart';
 
 class MockSessionRepository implements SessionRepository {
   final BlocGeneral<Either<ErrorItem, UserModel?>> _userStream =
