@@ -1,4 +1,4 @@
-## 1.1.0 - 2025-06-24
+## 0.17.0 - 2025-06-24
 
 ### Minor
 - Al crear una partida en modo fake, ahora se agregan automáticamente un jugador y un espectador de prueba para facilitar la visualización y pruebas de la mesa de Planning Poker.
