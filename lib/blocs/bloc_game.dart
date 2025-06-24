@@ -8,6 +8,7 @@ import '../domain/models/vote_model.dart';
 import '../domain/usecases/game/create_game_usecase.dart';
 import '../domain/usecases/game/get_game_stream_usecase.dart';
 import '../shared/deck.dart';
+import '../ui/modals/name_and_role_modal.dart';
 import '../views/enum_views.dart';
 import 'bloc_modal.dart';
 import 'bloc_navigator.dart';
@@ -66,6 +67,11 @@ class BlocGame {
   /// Valida si el nombre de la partida es válido según las reglas de negocio (>= 3 caracteres)
   bool get isNameValid => _gameBloc.value.name.trim().length >= 3;
 
+  Future<void> createMyGame() async {
+    await createGame(name: selectedGame.name);
+    showNameAndRoleModal();
+  }
+
   Future<void> createGame({required String name}) async {
     final UserModel? admin = blocSession.user;
     if (admin == null) {
@@ -77,7 +83,7 @@ class BlocGame {
       name: name,
       admin: admin,
       spectators: const <UserModel>[],
-      players: const <UserModel>[],
+      players: <UserModel>[admin],
       votes: const <VoteModel>[],
       isActive: true,
       createdAt: DateTime.now(),
@@ -123,12 +129,64 @@ class BlocGame {
 
   Role? get selectedRole => _gameBloc.value.role;
 
-  void updateGameRole(Role role) {
+  /// Inscribe cualquier usuario en la lista correspondiente según el rol y actualiza el GameModel.
+  /// Útil para admins que gestionan la mesa o para operaciones avanzadas.
+  Future<void> setUserRole({
+    required UserModel user,
+    required Role role,
+  }) async {
+    final GameModel game = _gameBloc.value;
+    // Remover usuario de ambas listas
+    final List<UserModel> updatedPlayers = List<UserModel>.from(game.players)
+      ..removeWhere((UserModel u) => u.id == user.id);
+    final List<UserModel> updatedSpectators = List<UserModel>.from(
+      game.spectators,
+    )..removeWhere((UserModel u) => u.id == user.id);
+    // Agregar a la lista correspondiente
+    if (role == Role.jugador) {
+      updatedPlayers.add(user);
+    } else {
+      updatedSpectators.add(user);
+    }
+    // Actualizar el modelo y persistir
+    _gameBloc.value = game.copyWith(
+      players: updatedPlayers,
+      spectators: updatedSpectators,
+      role: role,
+    );
+    await updateGame();
+  }
+
+  /// Inscribe SOLO al usuario actual (el que está en sesión) en la lista correspondiente según el rol y actualiza el GameModel.
+  /// Este es el método que debe consumir el modal de selección de rol.
+  Future<void> setCurrentUserRole(Role role) async {
+    final UserModel? user = blocSession.user;
+    if (user == null) {
+      return;
+    }
+    await setUserRole(user: user, role: role);
+  }
+
+  void selectRoleDraft(Role role) {
     _gameBloc.value = _gameBloc.value.copyWith(role: role);
   }
 
-  void updateGameName(String newName) {
-    _gameBloc.value = _gameBloc.value.copyWith(name: newName);
+  void updateNameDraft(String name) {
+    _gameBloc.value = _gameBloc.value.copyWith(name: name);
+  }
+
+  void confirmRoleSelection() {
+    setCurrentUserRole(selectedRole ?? Role.jugador);
+    blocModal.hideModal();
+  }
+
+  /// Muestra el modal para seleccionar nombre y rol, y gestiona la inscripción reactiva del usuario.
+  void showNameAndRoleModal() {
+    blocModal.showModal(NameAndRoleModal(blocGame: this));
+  }
+
+  void setName(String newName) {
+    updateNameDraft(newName);
   }
 
   void dispose() {

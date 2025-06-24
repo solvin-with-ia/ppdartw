@@ -48,7 +48,7 @@ class CreateGameView extends StatelessWidget {
                         label: 'Nombre de la partida',
                         value: blocGame.selectedGame.name,
                         onChanged: (String value) =>
-                            blocGame.updateGameName(value),
+                            blocGame.setName(value),
                         hintText: 'Ingresa el nombre de la partida',
                       ),
                       const SizedBox(height: 24),
@@ -62,11 +62,7 @@ class CreateGameView extends StatelessWidget {
                               return ButtonWidget(
                                 label: 'Crear partida',
                                 enabled: blocGame.isNameValid,
-                                onTap: () {
-                                  blocGame.createGame(
-                                    name: blocGame.selectedGame.name,
-                                  );
-                                },
+                                onTap: blocGame.createMyGame,
                               );
                             },
                       ),

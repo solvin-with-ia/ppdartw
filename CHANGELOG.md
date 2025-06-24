@@ -1,3 +1,10 @@
+## 1.1.0 - 2025-06-24
+
+### Changed
+- Refactor de métodos de asignación y selección de roles en BlocGame (nombres más claros y consistentes).
+- Actualización de referencias en NameAndRoleModal, CreateGameView y tests para reflejar los nuevos nombres de métodos.
+- Mejora de claridad, mantenibilidad y cobertura de tests en la lógica de roles y creación de partidas.
+
 ## 0.16.0
 
 - Nuevo widget PlanningPokerTableWidget: mesa completa con slots para jugadores y espectadores, alineados a Figma.

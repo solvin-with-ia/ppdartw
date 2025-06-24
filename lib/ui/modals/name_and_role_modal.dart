@@ -1,26 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../blocs/bloc_game.dart';
 import '../../domain/enums/role.dart';
+import '../../domain/models/game_model.dart';
 import '../../shared/device_utils.dart';
+import '../widgets/button_widget.dart';
 import '../widgets/forms/custom_input_widget.dart';
 
 class NameAndRoleModal extends StatelessWidget {
-  const NameAndRoleModal({
-    required this.name,
-    required this.selectedRole,
-    required this.onNameChanged,
-    required this.onRoleChanged,
-    super.key,
-    this.onContinue,
-    this.onClose,
-  });
+  const NameAndRoleModal({required this.blocGame, super.key});
 
-  final String name;
-  final Role? selectedRole;
-  final ValueChanged<String> onNameChanged;
-  final ValueChanged<Role> onRoleChanged;
-  final VoidCallback? onContinue;
-  final VoidCallback? onClose;
+  final BlocGame blocGame;
 
   @override
   Widget build(BuildContext context) {
@@ -28,99 +18,89 @@ class NameAndRoleModal extends StatelessWidget {
         getDeviceType(MediaQuery.of(context).size.width) == DeviceType.mobile;
     final double modalWidth = isMobile ? 340 : 480;
     final double maxModalHeight = MediaQuery.of(context).size.height * 0.9;
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: modalWidth,
-            maxHeight: maxModalHeight,
-          ),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1036),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.purple.withValues(alpha: 0.5),
-                blurRadius: 32,
-                spreadRadius: 2,
+    return StreamBuilder<GameModel>(
+      stream: blocGame.gameStream,
+      builder: (_, __) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: modalWidth,
+                maxHeight: maxModalHeight,
               ),
-            ],
-            border: Border.all(color: Colors.purpleAccent.shade100, width: 2),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const SizedBox(height: 8),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Tu nombre',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white,
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1036),
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: Colors.purple.withValues(alpha: 0.5),
+                    blurRadius: 32,
+                    spreadRadius: 2,
                   ),
+                ],
+                border: Border.all(
+                  color: Colors.purpleAccent.shade100,
+                  width: 2,
                 ),
               ),
-              const SizedBox(height: 8),
-              CustomInputWidget(
-                label: 'Tu nombre',
-                value: name,
-                onChanged: onNameChanged,
-                hintText: 'Ingresa tu nombre',
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  _RoleRadio(
-                    label: 'Jugador',
-                    value: Role.jugador,
-                    groupValue: selectedRole,
-                    onChanged: onRoleChanged,
+                  const SizedBox(height: 8),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Tu nombre',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 32),
-                  _RoleRadio(
-                    label: 'Espectador',
-                    value: Role.espectador,
-                    groupValue: selectedRole,
-                    onChanged: onRoleChanged,
+                  const SizedBox(height: 8),
+                  CustomInputWidget(
+                    label: 'Tu nombre',
+                    value: blocGame.selectedGame.name,
+                    onChanged: blocGame.updateNameDraft,
+                    hintText: 'Ingresa tu nombre',
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      _RoleRadio(
+                        label: 'Jugador',
+                        value: Role.jugador,
+                        groupValue: blocGame.selectedRole,
+                        onChanged: blocGame.selectRoleDraft,
+                      ),
+                      const SizedBox(width: 32),
+                      _RoleRadio(
+                        label: 'Espectador',
+                        value: Role.espectador,
+                        groupValue: blocGame.selectedRole,
+                        onChanged: blocGame.selectRoleDraft,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: 180,
+                    height: 44,
+                    child: ButtonWidget(
+                      label: 'Continuar',
+                      onTap: blocGame.confirmRoleSelection,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: 180,
-                height: 44,
-                child: ElevatedButton(
-                  onPressed: onContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.12),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                    disabledBackgroundColor: Colors.white.withValues(
-                      alpha: 0.10,
-                    ),
-                    disabledForegroundColor: Colors.white.withValues(
-                      alpha: 0.54,
-                    ),
-                  ),
-                  child: const Text('Continuar'),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

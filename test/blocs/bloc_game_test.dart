@@ -226,14 +226,14 @@ void main() {
 
     test('updateGameName actualiza el nombre de la partida', () {
       blocGame.createGame(name: 'Partida Test');
-      blocGame.updateGameName('Nuevo Nombre');
+      blocGame.setName('Nuevo Nombre');
       expect(blocGame.selectedGame.name, 'Nuevo Nombre');
     });
 
     test('updateGame persiste y mantiene el draft actualizado', () async {
       await blocGame.createGame(name: 'Partida Persistida');
       final String oldId = blocGame.selectedGame.id;
-      blocGame.updateGameName('Nombre Actualizado');
+      blocGame.setName('Nombre Actualizado');
       // Simula que el backend persiste el modelo actualizado
       dummyGetGameStreamUsecase.setGame(blocGame.selectedGame);
       await blocGame.updateGame();
