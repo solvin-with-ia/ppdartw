@@ -97,7 +97,7 @@ class BlocGame {
       id: _generateUuid(),
       name: name,
       admin: admin,
-      spectators: <UserModel>[fakeSpectator],
+      spectators: const <UserModel>[fakeSpectator],
       players: <UserModel>[admin, fakePlayer],
       votes: const <VoteModel>[],
       isActive: true,
