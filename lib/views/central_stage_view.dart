@@ -7,7 +7,7 @@ import '../domain/models/game_model.dart';
 import '../ui/widgets/button_widget.dart';
 import '../ui/widgets/deck_widget.dart';
 import '../ui/widgets/logo_horizontal_widget.dart';
-import '../ui/widgets/poker_table_widget.dart';
+import '../ui/widgets/planning_poker_table_widget.dart';
 import '../ui/widgets/user_square_widget.dart';
 
 class CentralStageView extends StatelessWidget {
@@ -67,8 +67,8 @@ class CentralStageView extends StatelessWidget {
                               ),
                             ),
                             const Spacer(),
-                            // Mesa central
-                            PokerTableWidget(game: game),
+                            // Mesa completa Planning Poker
+                            PlanningPokerTableWidget(game: game),
                             const Spacer(),
                             // Cartas disponibles
                             if (game.deck.isNotEmpty)

@@ -1,3 +1,10 @@
+## 0.16.0
+
+- Nuevo widget PlanningPokerTableWidget: mesa completa con slots para jugadores y espectadores, alineados a Figma.
+- Integración de PlanningPokerTableWidget en CentralStageView, reemplazando PokerTableWidget.
+- Slots invisibles y lógica de asignación robusta para mantener simetría visual.
+- Ajustes menores de layout y mejoras visuales en widgets relacionados (PlayCardModelWidget, UserSquareWidget, DeckWidget).
+
 ## 0.15.0
 
 - Nuevo widget PlayCardModelWidget: muestra el reverso de la carta para jugadores y el avatar cuadrado para espectadores, ambos con el nombre en la parte inferior. Permite visualización clara y compacta en la mesa.
