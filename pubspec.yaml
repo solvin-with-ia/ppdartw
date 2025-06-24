@@ -4,6 +4,7 @@ description: |
   El proyecto implementa arquitectura limpia y principios SOLID, empleando el patrón BLoC y dependencias provenientes del paquete jocaagura_domain.
   Flujo de datos: Services <-> Gateway (JSON) <-> Repository (Model) <-> Usecases <-> Bloc <-> UI <-> AppManager (Inyector de dependencias de nuestros BLoC) <-> Views/Pages <-> Widgets.
 version: 1.1.0
+1.1.0
 
 environment:
   sdk: ^3.8.0

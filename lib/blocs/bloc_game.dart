@@ -78,12 +78,27 @@ class BlocGame {
       // Aquí podrías redirigir al login, por ahora simplemente retorna
       return;
     }
+    // Usuarios fake para pruebas
+    const UserModel fakePlayer = UserModel(
+      id: 'fake_player',
+      displayName: 'Jugador Fake',
+      photoUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
+      email: 'jugador@fake.com',
+      jwt: <String, dynamic>{},
+    );
+    const UserModel fakeSpectator = UserModel(
+      id: 'fake_spectator',
+      displayName: 'Espectador Fake',
+      photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+      email: 'espectador@fake.com',
+      jwt: <String, dynamic>{},
+    );
     final GameModel game = GameModel(
       id: _generateUuid(),
       name: name,
       admin: admin,
-      spectators: const <UserModel>[],
-      players: <UserModel>[admin],
+      spectators: <UserModel>[fakeSpectator],
+      players: <UserModel>[admin, fakePlayer],
       votes: const <VoteModel>[],
       isActive: true,
       createdAt: DateTime.now(),

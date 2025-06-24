@@ -53,7 +53,10 @@ class CentralStageView extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  UserSquareWidget(user: user),
+                                  UserSquareWidget(
+                                    user: user,
+                                    onTap: blocGame.showNameAndRoleModal,
+                                  ),
                                   const Spacer(),
                                   const LogoHorizontalWidget(
                                     label: 'Planning Poker',
@@ -68,7 +71,10 @@ class CentralStageView extends StatelessWidget {
                             ),
                             const Spacer(),
                             // Mesa completa Planning Poker
-                            PlanningPokerTableWidget(game: game),
+                            PlanningPokerTableWidget(
+                              game: game,
+                              currentUser: user,
+                            ),
                             const Spacer(),
                             // Cartas disponibles
                             if (game.deck.isNotEmpty)

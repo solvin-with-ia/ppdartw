@@ -1,6 +1,7 @@
 ## 1.1.0 - 2025-06-24
 
-### Changed
+### Minor
+- Al crear una partida en modo fake, ahora se agregan automáticamente un jugador y un espectador de prueba para facilitar la visualización y pruebas de la mesa de Planning Poker.
 - Refactor de métodos de asignación y selección de roles en BlocGame (nombres más claros y consistentes).
 - Actualización de referencias en NameAndRoleModal, CreateGameView y tests para reflejar los nuevos nombres de métodos.
 - Mejora de claridad, mantenibilidad y cobertura de tests en la lógica de roles y creación de partidas.

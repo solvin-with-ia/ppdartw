@@ -6,9 +6,14 @@ import 'poker_table_widget.dart';
 
 /// Widget que representa la mesa completa de Planning Poker con slots para jugadores/espectadores.
 class PlanningPokerTableWidget extends StatelessWidget {
-  const PlanningPokerTableWidget({required this.game, super.key});
+  const PlanningPokerTableWidget({
+    required this.game,
+    this.currentUser,
+    super.key,
+  });
 
   final GameModel game;
+  final UserModel? currentUser;
 
   static const int _slotsTop = 5;
   static const int _slotsBottom = 5;
@@ -19,25 +24,69 @@ class PlanningPokerTableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mezclar jugadores y espectadores para llenar los 12 slots
-    final List<UserModel> users = <UserModel>[
+    // --- NUEVA LÓGICA: Usuario actual siempre en el centro abajo ---
+    final UserModel protagonistUser =
+        currentUser ??
+        game.admin; // Usa el usuario actual si se pasa, si no el admin
+
+    // Construir lista de todos los usuarios (jugadores y espectadores)
+    final List<UserModel> allUsers = <UserModel>[
       ...game.players,
       ...game.spectators,
     ];
-    final List<bool> isSpectator = <bool>[
+    final List<bool> allIsSpectator = <bool>[
       ...List<bool>.filled(game.players.length, false),
       ...List<bool>.filled(game.spectators.length, true),
     ];
-    // Asegurar 12 slots, rellenar con null si faltan
+
+    // Separar usuario actual y el resto
+    final int protagonistIdx = allUsers.indexWhere(
+      (UserModel u) => u.id == protagonistUser.id,
+    );
+    UserModel? protagonist;
+    bool? protagonistIsSpectator;
+    if (protagonistIdx != -1) {
+      protagonist = allUsers.removeAt(protagonistIdx);
+      protagonistIsSpectator = allIsSpectator.removeAt(protagonistIdx);
+    }
+
+    // Mezclar aleatoriamente el resto
+    final List<MapEntry<UserModel, bool>> rest =
+        List<MapEntry<UserModel, bool>>.generate(
+          allUsers.length,
+          (int i) => MapEntry<UserModel, bool>(allUsers[i], allIsSpectator[i]),
+        )..shuffle();
+
+    // Asignar usuarios a los slots
     final List<UserModel?> slotUsers = List<UserModel?>.filled(
       _totalSlots,
       null,
     );
     final List<bool?> slotSpectator = List<bool?>.filled(_totalSlots, null);
-    for (int i = 0; i < users.length && i < _totalSlots; i++) {
-      slotUsers[i] = users[i];
-      slotSpectator[i] = isSpectator[i];
+
+    // Índices de slots
+    const int bottomRowStart = _slotsTop + _slotsLeft;
+    const int protagonistSlot =
+        bottomRowStart + 2; // slot central de los 5 de abajo
+
+    // Colocar protagonista
+    if (protagonist != null) {
+      slotUsers[protagonistSlot] = protagonist;
+      slotSpectator[protagonistSlot] = protagonistIsSpectator;
     }
+
+    // Lista de slots disponibles (excepto el central inferior)
+    final List<int> availableSlots = List<int>.generate(
+      _totalSlots,
+      (int i) => i,
+    )..remove(protagonistSlot);
+
+    // Asignar el resto
+    for (int i = 0; i < rest.length && i < availableSlots.length; i++) {
+      slotUsers[availableSlots[i]] = rest[i].key;
+      slotSpectator[availableSlots[i]] = rest[i].value;
+    }
+    // --- FIN NUEVA LÓGICA ---
 
     return SizedBox(
       width: 520,
