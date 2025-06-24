@@ -5,10 +5,16 @@ import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'user_avatar_fallback_text.dart';
 
 class UserSquareWidget extends StatelessWidget {
-  const UserSquareWidget({required this.user, this.onTap, super.key});
+  const UserSquareWidget({
+    required this.user,
+    this.onTap,
+    this.displayName = true,
+    super.key,
+  });
 
   final UserModel user;
   final VoidCallback? onTap;
+  final bool displayName;
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +54,17 @@ class UserSquareWidget extends StatelessWidget {
                   ),
           ),
           const SizedBox(height: 6),
-          Text(
-            user.displayName,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+          if (displayName)
+            Text(
+              user.displayName,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
         ],
       ),
     );

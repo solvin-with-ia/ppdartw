@@ -1,3 +1,9 @@
+## 0.15.0
+
+- Nuevo widget PlayCardModelWidget: muestra el reverso de la carta para jugadores y el avatar cuadrado para espectadores, ambos con el nombre en la parte inferior. Permite visualización clara y compacta en la mesa.
+- UserSquareWidget ahora admite ocultar el nombre (parámetro displayName).
+- Mejoras visuales y de flexibilidad para la representación de usuarios en la mesa.
+
 ## 0.14.0
 
 - Limpieza mayor de archivos legacy bajo lib/domains/ (modelos, gateways, servicios y usecases eliminados).
