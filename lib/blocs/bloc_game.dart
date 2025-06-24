@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
 import '../domain/enums/role.dart';
+import '../domain/models/card_model.dart';
 import '../domain/models/game_model.dart';
 import '../domain/models/vote_model.dart';
 import '../domain/usecases/game/create_game_usecase.dart';
@@ -143,6 +144,20 @@ class BlocGame {
   }
 
   Role? get selectedRole => _gameBloc.value.role;
+
+  /// Permite al usuario actual seleccionar una carta (votar). Si ya votó, reemplaza su voto.
+  Future<void> setVote(CardModel card) async {
+    final UserModel? user = blocSession.user;
+    if (user == null) {
+      return;
+    }
+    final GameModel game = _gameBloc.value;
+    final List<VoteModel> updatedVotes = List<VoteModel>.from(game.votes)
+      ..removeWhere((VoteModel v) => v.userId == user.id);
+    updatedVotes.add(VoteModel(userId: user.id, cardId: card.id));
+    _gameBloc.value = game.copyWith(votes: updatedVotes);
+    await updateGame();
+  }
 
   /// Inscribe cualquier usuario en la lista correspondiente según el rol y actualiza el GameModel.
   /// Útil para admins que gestionan la mesa o para operaciones avanzadas.

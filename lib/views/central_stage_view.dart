@@ -78,10 +78,7 @@ class CentralStageView extends StatelessWidget {
                             const Spacer(),
                             // Cartas disponibles
                             if (game.deck.isNotEmpty)
-                              DeckWidget(
-                                deck: game.deck,
-                                title: 'Elige una carta 👇',
-                              ),
+                              DeckWidget(blocGame: blocGame),
                           ],
                         ),
                       ),

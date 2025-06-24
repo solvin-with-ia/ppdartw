@@ -1,3 +1,10 @@
+## 0.18.0 - 2025-06-24
+
+### Minor
+- Integración global y reactiva de selección de carta/voto en Planning Poker.
+- DeckWidget ahora es reactivo y resalta la carta seleccionada del usuario.
+- Lógica de voto centralizada en BlocGame, con persistencia y actualización para todos los jugadores.
+
 ## 0.17.0 - 2025-06-24
 
 ### Minor
