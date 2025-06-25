@@ -71,10 +71,7 @@ class CentralStageView extends StatelessWidget {
                             ),
                             const Spacer(),
                             // Mesa completa Planning Poker
-                            PlanningPokerTableWidget(
-                              game: game,
-                              currentUser: user,
-                            ),
+                            PlanningPokerTableWidget(blocGame: blocGame),
                             const Spacer(),
                             // Cartas disponibles
                             if (game.deck.isNotEmpty)

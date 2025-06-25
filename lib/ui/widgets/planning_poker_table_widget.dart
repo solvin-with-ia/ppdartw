@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
+import '../../blocs/bloc_game.dart';
 import '../../domain/models/game_model.dart';
 import 'play_card_model_widget.dart';
 import 'poker_table_widget.dart';
 
 /// Widget que representa la mesa completa de Planning Poker con slots para jugadores/espectadores.
 class PlanningPokerTableWidget extends StatelessWidget {
-  const PlanningPokerTableWidget({
-    required this.game,
-    this.currentUser,
-    super.key,
-  });
+  const PlanningPokerTableWidget({required this.blocGame, super.key});
 
-  final GameModel game;
-  final UserModel? currentUser;
+  final BlocGame blocGame;
 
   static const int _slotsTop = 5;
   static const int _slotsBottom = 5;
@@ -24,6 +20,8 @@ class PlanningPokerTableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GameModel game = blocGame.selectedGame;
+    final UserModel? currentUser = blocGame.blocSession.user;
     // --- NUEVA LÓGICA: Usuario actual siempre en el centro abajo ---
     final UserModel protagonistUser =
         currentUser ??
