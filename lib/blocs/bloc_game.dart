@@ -145,6 +145,53 @@ class BlocGame {
 
   Role? get selectedRole => _gameBloc.value.role;
 
+  /// Revela los votos (cartas) de todos los jugadores
+  Future<void> revealVotes() async {
+    _gameBloc.value = _gameBloc.value.copyWith(votesRevealed: true);
+    await updateGame();
+  }
+
+  /// Oculta los votos (cartas)
+  Future<void> hideVotes() async {
+    _gameBloc.value = _gameBloc.value.copyWith(votesRevealed: false);
+    await updateGame();
+  }
+
+  /// Calcula el promedio de los votos revelados (solo cartas numéricas)
+  double? calculateAverage() {
+    final GameModel game = _gameBloc.value;
+    if (!game.votesRevealed) {
+      return null;
+    }
+    final List<VoteModel> votes = game.votes;
+    final List<CardModel> deck = game.deck;
+    final List<double> values = votes
+        .map((VoteModel vote) {
+          final CardModel card = deck.firstWhere(
+            (CardModel c) => c.id == vote.cardId,
+            orElse: () =>
+                const CardModel(id: '', display: '', value: 0, description: ''),
+          );
+          return card.value.toDouble();
+        })
+        .whereType<double>()
+        .toList();
+    if (values.isEmpty) {
+      return null;
+    }
+    final double sum = values.fold(0.0, (double a, double b) => a + b);
+    return sum / values.length;
+  }
+
+  /// Reinicia la ronda: limpia los votos y oculta las cartas
+  Future<void> resetRound() async {
+    _gameBloc.value = _gameBloc.value.copyWith(
+      votes: <VoteModel>[],
+      votesRevealed: false,
+    );
+    await updateGame();
+  }
+
   /// Permite al usuario actual seleccionar una carta (votar). Si ya votó, reemplaza su voto.
   Future<void> setVote(CardModel card) async {
     final UserModel? user = blocSession.user;

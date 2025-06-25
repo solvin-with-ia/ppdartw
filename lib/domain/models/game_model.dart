@@ -25,6 +25,7 @@ class GameModel {
     this.stories = const <String>[],
     this.revealTimeout,
     this.role = Role.jugador,
+    this.votesRevealed = false,
   });
 
   factory GameModel.empty() => GameModel(
@@ -67,7 +68,11 @@ class GameModel {
         : Utils.convertJsonToList(json['stories']?.toString() ?? ''),
     deck: convertJsonToModelList<CardModel>(json['deck'], CardModel.fromJson),
     revealTimeout: json['revealTimeout'] as int?,
+    votesRevealed:
+        json['votesRevealed'] ==
+        true, // null o cualquier valor que no sea true será false
   );
+  final bool votesRevealed;
   final Role? role;
   final bool isNew;
   // ...
@@ -84,6 +89,7 @@ class GameModel {
     DateTime? finishedAt,
     bool? isNew,
     Role? role,
+    bool? votesRevealed,
   }) {
     return GameModel(
       id: id ?? this.id,
@@ -98,6 +104,7 @@ class GameModel {
       finishedAt: finishedAt ?? this.finishedAt,
       isNew: isNew ?? this.isNew,
       role: role ?? this.role,
+      votesRevealed: votesRevealed ?? this.votesRevealed,
     );
   }
 

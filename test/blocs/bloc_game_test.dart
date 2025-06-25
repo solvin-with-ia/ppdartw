@@ -252,5 +252,82 @@ void main() {
     test('dispose no lanza errores', () {
       expect(() => blocGame.dispose(), returnsNormally);
     });
+
+    group('Votación y flujo de ronda', () {
+      setUp(() async {
+        await blocGame.createGame(name: 'Ronda Test');
+        await Future<void>.delayed(Duration.zero);
+      });
+
+      test('Los votos están ocultos por defecto', () {
+        expect(blocGame.selectedGame.votesRevealed, isFalse);
+      });
+
+      test('revealVotes cambia votesRevealed a true', () async {
+        await blocGame.revealVotes();
+        expect(blocGame.selectedGame.votesRevealed, isTrue);
+      });
+
+      test('hideVotes cambia votesRevealed a false', () async {
+        await blocGame.revealVotes();
+        await blocGame.hideVotes();
+        expect(blocGame.selectedGame.votesRevealed, isFalse);
+      });
+
+      test('calculateAverage retorna null si los votos no están revelados', () {
+        expect(blocGame.calculateAverage(), isNull);
+      });
+
+      test(
+        'calculateAverage retorna el promedio correcto cuando los votos están revelados',
+        () async {
+          // Simula votos de cartas numéricas solo del usuario actual
+          final List<CardModel> deck = <CardModel>[
+            const CardModel(
+              id: '1',
+              display: '1',
+              value: 1,
+              description: 'Uno',
+            ),
+            const CardModel(
+              id: '2',
+              display: '2',
+              value: 2,
+              description: 'Dos',
+            ),
+            const CardModel(
+              id: '3',
+              display: '3',
+              value: 3,
+              description: 'Tres',
+            ),
+          ];
+          await blocGame.createGame(name: 'Promedio Test');
+          // No hay setter público para deck, pero el deck por defecto tiene cartas, así que usamos las cartas del deck por defecto
+          // Vota primero por la carta 1
+          await blocGame.setVote(deck[0]);
+          // Vota por la carta 3 (esto reemplaza el voto anterior)
+          await blocGame.setVote(deck[2]);
+          await blocGame.revealVotes();
+          final double? promedio = blocGame.calculateAverage();
+          expect(promedio, closeTo(3.0, 0.01));
+        },
+      );
+
+      test('resetRound limpia votos y oculta cartas', () async {
+        // Simula votos y revela
+        // Simula votos y revela usando solo métodos públicos
+        await blocGame.createGame(name: 'Ronda Test 2');
+        // No hay forma directa de setear votes/votesRevealed salvo exponer un método de test o usar los métodos públicos
+        // Aquí solo verificamos que resetRound limpia los votos y oculta las cartas tras revealVotes + setVote
+        await blocGame.setVote(
+          const CardModel(id: '1', display: '1', value: 1, description: 'Uno'),
+        );
+        await blocGame.revealVotes();
+        await blocGame.resetRound();
+        expect(blocGame.selectedGame.votes, isEmpty);
+        expect(blocGame.selectedGame.votesRevealed, isFalse);
+      });
+    });
   });
 }

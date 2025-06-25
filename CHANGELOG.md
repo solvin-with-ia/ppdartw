@@ -1,3 +1,10 @@
+## 0.19.0 - 2025-06-25
+
+### Minor
+- Lógica de reveal/hide votes (`votesRevealed`) en BlocGame y GameModel.
+- Métodos para cálculo de promedio de votos y reinicio de ronda.
+- Tests unitarios completos para el flujo de Planning Poker (revelar, ocultar, promedio, reset).
+
 ## 0.18.0 - 2025-06-24
 
 ### Minor
