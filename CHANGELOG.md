@@ -1,3 +1,10 @@
+## 0.20.0 - 2025-06-25
+
+### Minor
+- Lógica de asientos centralizada en BlocGame (asignación, reshuffle, getter público).
+- Pruebas unitarias para la lógica de asientos.
+- Refactor para facilitar la integración de la mesa en la UI.
+
 ## 0.19.0 - 2025-06-25
 
 ### Minor

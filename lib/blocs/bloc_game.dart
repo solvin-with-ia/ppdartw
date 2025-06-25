@@ -26,6 +26,58 @@ class BlocGame {
   }) {
     init();
   }
+  // --- Lógica de asientos para la mesa de Planning Poker ---
+  static const int seatsCount = 12;
+  static const int protagonistSeat = 8;
+  List<UserModel?> _seatsOfPlanningPoker = List<UserModel?>.filled(
+    seatsCount,
+    null,
+  );
+
+  /// Getter público para la UI
+  List<UserModel?> get seatsOfPlanningPoker =>
+      List<UserModel?>.unmodifiable(_seatsOfPlanningPoker);
+
+  /// Inicializa los asientos según el estado actual del juego y usuario
+  void initializeSeats() {
+    final GameModel game = _gameBloc.value;
+    final UserModel? current = blocSession.user;
+    if (current == null) {
+      return;
+    }
+    // Limpia los asientos
+    _seatsOfPlanningPoker = List<UserModel?>.filled(seatsCount, null);
+    // Asigna al usuario actual en la posición 8
+    _seatsOfPlanningPoker[protagonistSeat] = current;
+    // Construye la lista de usuarios excluyendo el actual
+    final List<UserModel> others = <UserModel>[
+      ...game.players.where((UserModel u) => u.id != current.id),
+      ...game.spectators.where((UserModel u) => u.id != current.id),
+    ];
+    // Mezcla aleatoriamente
+    others.shuffle();
+    // Asigna los demás usuarios a los asientos restantes
+    int seatIdx = 0;
+    for (final UserModel user in others) {
+      // Busca el siguiente asiento vacío (saltando el protagonista)
+      while (seatIdx < seatsCount &&
+          (_seatsOfPlanningPoker[seatIdx] != null ||
+              seatIdx == protagonistSeat)) {
+        seatIdx++;
+      }
+      if (seatIdx < seatsCount) {
+        _seatsOfPlanningPoker[seatIdx] = user;
+        seatIdx++;
+      } else {
+        break; // No hay más asientos
+      }
+    }
+  }
+
+  /// Método para reasignar los asientos (shuffle manual)
+  void reshuffleSeats() {
+    initializeSeats();
+  }
 
   final GetGameStreamUsecase getGameStreamUsecase;
   StreamSubscription<Either<ErrorItem, GameModel?>>? _gameSubscription;

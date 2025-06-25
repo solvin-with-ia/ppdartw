@@ -1,10 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
 import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
+import 'package:ppdartw/domain/enums/role.dart';
 import 'package:ppdartw/domain/models/card_model.dart';
 import 'package:ppdartw/domain/models/game_model.dart';
 import 'package:ppdartw/domain/models/vote_model.dart';
@@ -328,6 +330,100 @@ void main() {
         expect(blocGame.selectedGame.votes, isEmpty);
         expect(blocGame.selectedGame.votesRevealed, isFalse);
       });
+    });
+
+    group('Lógica de asientos', () {
+      setUp(() async {
+        await blocGame.createGame(name: 'Mesa Test');
+        await Future<void>.delayed(Duration.zero);
+      });
+
+      test('El usuario actual siempre está en la posición 8', () {
+        blocGame.initializeSeats();
+        final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
+        expect(
+          seats[BlocGame.protagonistSeat]?.id,
+          blocGame.blocSession.user?.id,
+        );
+      });
+
+      test(
+        'Los demás jugadores/espectadores se distribuyen en los asientos',
+        () async {
+          // Agrega varios jugadores y espectadores
+          const UserModel jugador2 = UserModel(
+            id: 'j2',
+            displayName: 'J2',
+            email: '',
+            photoUrl: '',
+            jwt: <String, dynamic>{},
+          );
+          const UserModel espectador1 = UserModel(
+            id: 'e1',
+            displayName: 'E1',
+            email: '',
+            photoUrl: '',
+            jwt: <String, dynamic>{},
+          );
+          await blocGame.setUserRole(user: jugador2, role: Role.jugador);
+          await blocGame.setUserRole(user: espectador1, role: Role.espectador);
+          blocGame.initializeSeats();
+          final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
+          final Set<String> ids = seats
+              .whereType<UserModel>()
+              .map((UserModel u) => u.id)
+              .toSet();
+          expect(ids.contains('j2'), isTrue);
+          expect(ids.contains('e1'), isTrue);
+        },
+      );
+
+      test('Los asientos vacíos son null', () {
+        blocGame.initializeSeats();
+        final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
+        // Si hay menos de 12 usuarios, debe haber nulls
+        expect(seats.where((UserModel? u) => u == null).isNotEmpty, isTrue);
+      });
+
+      test(
+        'El reshuffle cambia la disposición (excepto el usuario actual)',
+        () async {
+          const UserModel jugador2 = UserModel(
+            id: 'j2',
+            displayName: 'J2',
+            email: '',
+            photoUrl: '',
+            jwt: <String, dynamic>{},
+          );
+          const UserModel espectador1 = UserModel(
+            id: 'e1',
+            displayName: 'E1',
+            email: '',
+            photoUrl: '',
+            jwt: <String, dynamic>{},
+          );
+          await blocGame.setUserRole(user: jugador2, role: Role.jugador);
+          await blocGame.setUserRole(user: espectador1, role: Role.espectador);
+          blocGame.initializeSeats();
+          final List<UserModel?> seats1 = List<UserModel?>.from(
+            blocGame.seatsOfPlanningPoker,
+          );
+          blocGame.reshuffleSeats();
+          final List<UserModel?> seats2 = blocGame.seatsOfPlanningPoker;
+          // El usuario actual sigue en la posición 8
+          expect(
+            seats2[BlocGame.protagonistSeat]?.id,
+            blocGame.blocSession.user?.id,
+          );
+          // Al menos uno de los otros asientos cambió
+          final bool changed = List<bool>.generate(
+            12,
+            (int i) =>
+                i != BlocGame.protagonistSeat && seats1[i]?.id != seats2[i]?.id,
+          ).any((bool b) => b);
+          expect(changed, isTrue);
+        },
+      );
     });
   });
 }
