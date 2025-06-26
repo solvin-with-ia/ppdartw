@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
@@ -77,52 +78,124 @@ class BlocGame {
       return;
     }
 
-    // El usuario actual siempre en el asiento 8
-    const int protagonistSeat = 8;
-    _seatsOfPlanningPoker = List<UserModel?>.filled(seatsCount, null);
-    _seatsOfPlanningPoker[protagonistSeat] = current;
+    // Limpieza de asientos: elimina usuarios que ya no están en el juego ni son currentUser
+    _cleanSeats(game, current);
 
-    // Primero jugadores (sin el usuario actual)
+    // 1. Inicializa asientos vacíos
+    final List<UserModel?> seats = List<UserModel?>.filled(seatsCount, null);
+    // 2. currentUser siempre en asiento 8
+    seats[protagonistSeat] = current;
+
+    // 3. Mapeo usuario→índice previo (excepto currentUser)
+    final Map<String, int> prevSeatMap = _getPrevSeatMap(current);
+
+    // 4. Separa jugadores y espectadores (sin currentUser)
     final List<UserModel> players = game.players
         .where((UserModel u) => u.id != current.id)
         .toList();
     final List<UserModel> spectators = game.spectators
         .where((UserModel u) => u.id != current.id)
         .toList();
-    int seatIdx = 0;
-    // Asignar jugadores
-    for (final UserModel user in players) {
-      while (seatIdx < seatsCount &&
-          (_seatsOfPlanningPoker[seatIdx] != null ||
-              seatIdx == protagonistSeat)) {
-        seatIdx++;
-      }
-      if (seatIdx < seatsCount) {
-        _seatsOfPlanningPoker[seatIdx] = user;
-        seatIdx++;
-      } else {
-        break;
-      }
-    }
-    // Asignar espectadores si hay espacio
-    for (final UserModel user in spectators) {
-      while (seatIdx < seatsCount &&
-          (_seatsOfPlanningPoker[seatIdx] != null ||
-              seatIdx == protagonistSeat)) {
-        seatIdx++;
-      }
-      if (seatIdx < seatsCount) {
-        _seatsOfPlanningPoker[seatIdx] = user;
-        seatIdx++;
-      } else {
-        break;
+    final Set<int> occupied = <int>{protagonistSeat};
+
+    // 5. Jugadores: conserva asiento previo si está libre
+    for (final UserModel player in players) {
+      final int? prev = prevSeatMap[player.id];
+      if (prev != null && seats[prev] == null && !occupied.contains(prev)) {
+        seats[prev] = player;
+        occupied.add(prev);
       }
     }
 
-    // Debug: imprime los asientos
-    for (int i = 0; i < _seatsOfPlanningPoker.length; i++) {
-      print('Silla $i: ${_seatsOfPlanningPoker[i]?.displayName ?? 'Vacía'}');
+    // 6. Jugadores restantes: mezcla y asigna aleatorio entre libres
+    final List<UserModel> playersNotSeated = players
+        .where((UserModel p) => !seats.contains(p))
+        .toList();
+    final List<UserModel> shuffledPlayersNotSeated = _shuffleList(
+      playersNotSeated,
+    );
+    final List<int> freeSeats = List<int>.generate(
+      seatsCount,
+      (int i) => i,
+    ).where((int i) => !occupied.contains(i) && seats[i] == null).toList();
+    for (final UserModel player in shuffledPlayersNotSeated) {
+      if (freeSeats.isNotEmpty) {
+        final int idx = _pickRandomIndex(freeSeats);
+        seats[freeSeats[idx]] = player;
+        occupied.add(freeSeats[idx]);
+        freeSeats.removeAt(idx);
+      }
     }
+
+    // 7. Espectadores: mezcla y asigna aleatorio entre libres
+    final List<UserModel> spectatorsNotSeated = spectators
+        .where((UserModel s) => !seats.contains(s))
+        .toList();
+    final List<UserModel> shuffledSpectatorsNotSeated = _shuffleList(
+      spectatorsNotSeated,
+    );
+    final List<int> freeSeatsForSpectators = List<int>.generate(
+      seatsCount,
+      (int i) => i,
+    ).where((int i) => seats[i] == null).toList();
+    for (final UserModel spectator in shuffledSpectatorsNotSeated) {
+      if (freeSeatsForSpectators.isNotEmpty) {
+        final int idx = _pickRandomIndex(freeSeatsForSpectators);
+        seats[freeSeatsForSpectators[idx]] = spectator;
+        freeSeatsForSpectators.removeAt(idx);
+      }
+    }
+
+    _seatsOfPlanningPoker = seats;
+  }
+
+  /// Elimina de la mesa los usuarios que ya no están en el juego ni son currentUser
+  void _cleanSeats(GameModel game, UserModel current) {
+    final Set<String> validIds = <String>{
+      current.id,
+      ...game.players.map((UserModel u) => u.id),
+      ...game.spectators.map((UserModel u) => u.id),
+    };
+    for (int i = 0; i < _seatsOfPlanningPoker.length; i++) {
+      final UserModel? user = _seatsOfPlanningPoker[i];
+      if (user != null && !validIds.contains(user.id)) {
+        _seatsOfPlanningPoker[i] = null;
+      }
+    }
+  }
+
+  /// Mapea id usuario → índice previo en asientos (excepto currentUser)
+  Map<String, int> _getPrevSeatMap(UserModel current) {
+    final Map<String, int> map = <String, int>{};
+    for (int i = 0; i < _seatsOfPlanningPoker.length; i++) {
+      final UserModel? user = _seatsOfPlanningPoker[i];
+      if (user != null && user.id != current.id) {
+        map[user.id] = i;
+      }
+    }
+    return map;
+  }
+
+  /// Mezcla una copia de la lista (Fisher-Yates)
+  List<T> _shuffleList<T>(List<T> list) {
+    final Random random = Random();
+    final List<T> copy = List<T>.from(list);
+    for (int i = copy.length - 1; i > 0; i--) {
+      final int j = random.nextInt(i + 1);
+      final T tmp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = tmp;
+    }
+    return copy;
+  }
+
+  /// Devuelve un índice aleatorio válido para la lista
+  int _pickRandomIndex<T>(List<T> list) {
+    if (list.isEmpty) {
+      throw StateError('No hay elementos para elegir');
+    }
+    final Random random = Random();
+    return random.nextInt(list.length);
   }
 
   final BlocModal blocModal;

@@ -1,3 +1,12 @@
+## 0.21.0 - 2025-06-26
+
+### Minor
+- Mejora y robustez en la lógica de asignación y limpieza de asientos en BlocGame:
+  - El usuario actual siempre ocupa la silla 8.
+  - Jugadores y espectadores nunca se duplican en asientos.
+  - Limpieza automática de asientos al salir usuarios.
+- Tests unitarios ampliados para cubrir duplicados, limpieza y estabilidad del asiento del usuario actual.
+
 ## 0.20.0 - 2025-06-25
 
 ### Minor

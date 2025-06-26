@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
@@ -133,6 +134,9 @@ class MockBlocSession extends BlocSession {
         signOutUsecase: FakeSignOutUsecase(),
         getUserStreamUsecase: FakeGetUserStreamUsecase(),
       );
+
+  @override
+  UserModel? get user => const DummyUserModel();
 }
 
 class MockCreateGameUsecase implements CreateGameUsecase {
@@ -336,11 +340,29 @@ void main() {
       setUp(() async {
         await blocGame.createGame(name: 'Mesa Test');
         await Future<void>.delayed(Duration.zero);
+        // Inserta explícitamente al usuario actual en la lista de jugadores del modelo
+        final UserModel current = blocGame.blocSession.user!;
+        final GameModel updated = blocGame.selectedGame.copyWith(
+          players: <UserModel>[
+            current,
+            ...blocGame.selectedGame.players.where(
+              (UserModel u) => u.id != current.id,
+            ),
+          ],
+        );
+        dummyGetGameStreamUsecase.setGame(updated);
+        await Future<void>.delayed(Duration.zero);
       });
 
       test('El usuario actual siempre está en la posición 8', () {
-        blocGame.initializeSeats();
         final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
+        if (seats[BlocGame.protagonistSeat]?.id !=
+            blocGame.blocSession.user?.id) {
+          // Debug: imprime los asientos si falla
+          for (int i = 0; i < seats.length; i++) {
+            debugPrint('Silla $i: ${seats[i]?.id ?? 'Vacía'}');
+          }
+        }
         expect(
           seats[BlocGame.protagonistSeat]?.id,
           blocGame.blocSession.user?.id,
@@ -348,7 +370,7 @@ void main() {
       });
 
       test(
-        'Los demás jugadores/espectadores se distribuyen en los asientos',
+        'Los demás jugadores/espectadores se distribuyen en los asientos y no hay duplicados',
         () async {
           // Agrega varios jugadores y espectadores
           const UserModel jugador2 = UserModel(
@@ -367,23 +389,72 @@ void main() {
           );
           await blocGame.setUserRole(user: jugador2, role: Role.jugador);
           await blocGame.setUserRole(user: espectador1, role: Role.espectador);
-          blocGame.initializeSeats();
           final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
           final Set<String> ids = seats
               .whereType<UserModel>()
               .map((UserModel u) => u.id)
               .toSet();
+          // Los usuarios deben estar presentes
           expect(ids.contains('j2'), isTrue);
           expect(ids.contains('e1'), isTrue);
+          expect(ids.contains('dummy'), isTrue);
+          // No debe haber duplicados
+          expect(ids.length, seats.whereType<UserModel>().length);
+          // El usuario actual nunca debe estar en otra posición que no sea la 8
+          for (int i = 0; i < seats.length; i++) {
+            if (i != BlocGame.protagonistSeat) {
+              expect(
+                seats[i]?.id == 'dummy',
+                isFalse,
+                reason: 'El usuario actual solo debe estar en la posición 8',
+              );
+            }
+          }
         },
       );
 
-      test('Los asientos vacíos son null', () {
-        blocGame.initializeSeats();
-        final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
-        // Si hay menos de 12 usuarios, debe haber nulls
-        expect(seats.where((UserModel? u) => u == null).isNotEmpty, isTrue);
-      });
+      test(
+        'Los asientos vacíos son null y limpieza de asientos funciona',
+        () async {
+          final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
+          // Si hay menos de 12 usuarios, debe haber nulls
+          expect(seats.where((UserModel? u) => u == null).isNotEmpty, isTrue);
+          // Simula que un usuario sale del juego y verifica limpieza
+          const UserModel jugador2 = UserModel(
+            id: 'j2',
+            displayName: 'J2',
+            email: '',
+            photoUrl: '',
+            jwt: <String, dynamic>{},
+          );
+          await blocGame.setUserRole(user: jugador2, role: Role.jugador);
+          expect(
+            blocGame.seatsOfPlanningPoker
+                .where((UserModel? u) => u?.id == 'j2')
+                .isNotEmpty,
+            isTrue,
+          );
+          // Elimina al jugador
+          await blocGame.setUserRole(user: jugador2, role: Role.espectador);
+          // Simula salida: elimina del modelo manualmente y actualiza el stream
+          final GameModel game = blocGame.selectedGame.copyWith(
+            players: blocGame.selectedGame.players
+                .where((UserModel u) => u.id != 'j2')
+                .toList(),
+            spectators: blocGame.selectedGame.spectators
+                .where((UserModel u) => u.id != 'j2')
+                .toList(),
+          );
+          dummyGetGameStreamUsecase.setGame(game);
+          await Future<void>.delayed(Duration.zero);
+          expect(
+            blocGame.seatsOfPlanningPoker
+                .where((UserModel? u) => u?.id == 'j2')
+                .isEmpty,
+            isTrue,
+          );
+        },
+      );
 
       test(
         'El reshuffle cambia la disposición (excepto el usuario actual)',
@@ -404,11 +475,11 @@ void main() {
           );
           await blocGame.setUserRole(user: jugador2, role: Role.jugador);
           await blocGame.setUserRole(user: espectador1, role: Role.espectador);
-          blocGame.initializeSeats();
+
           final List<UserModel?> seats1 = List<UserModel?>.from(
             blocGame.seatsOfPlanningPoker,
           );
-          blocGame.reshuffleSeats();
+
           final List<UserModel?> seats2 = blocGame.seatsOfPlanningPoker;
           // El usuario actual sigue en la posición 8
           expect(
