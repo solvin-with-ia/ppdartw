@@ -91,19 +91,79 @@ class BlocGame {
     _gameBloc.addFunctionToProcessTValueOnStream('navigateOnGameChange', (
       GameModel game,
     ) {
-      // Ejemplo: si el juego está creado y el usuario está autenticado, navega a la mesa central
       final UserModel? user = blocSession.user;
       if (user != null && game.id.isNotEmpty) {
         blocNavigator.goTo(EnumViews.centralStage);
       }
     });
 
-    // También puedes agregar lógica reactiva para el usuario si lo deseas
+    // Actualiza los asientos cada vez que cambia el juego
+    _gameBloc.addFunctionToProcessTValueOnStream('settingSeats', (
+      GameModel game,
+    ) {
+      _updateSeatsOnGameChange(game);
+    });
+
     blocSession.userStream.listen((UserModel? user) {
       if (user == null) {
         blocNavigator.goTo(EnumViews.splash);
       }
     });
+  }
+
+  /// Actualiza los asientos cada vez que cambia el juego
+  void _updateSeatsOnGameChange(GameModel game) {
+    final UserModel? current = blocSession.user;
+    if (current == null) {
+      return;
+    }
+
+    // El usuario actual siempre en el asiento 8
+    const int protagonistSeat = 8;
+    _seatsOfPlanningPoker = List<UserModel?>.filled(seatsCount, null);
+    _seatsOfPlanningPoker[protagonistSeat] = current;
+
+    // Primero jugadores (sin el usuario actual)
+    final List<UserModel> players = game.players
+        .where((UserModel u) => u.id != current.id)
+        .toList();
+    final List<UserModel> spectators = game.spectators
+        .where((UserModel u) => u.id != current.id)
+        .toList();
+    int seatIdx = 0;
+    // Asignar jugadores
+    for (final UserModel user in players) {
+      while (seatIdx < seatsCount &&
+          (_seatsOfPlanningPoker[seatIdx] != null ||
+              seatIdx == protagonistSeat)) {
+        seatIdx++;
+      }
+      if (seatIdx < seatsCount) {
+        _seatsOfPlanningPoker[seatIdx] = user;
+        seatIdx++;
+      } else {
+        break;
+      }
+    }
+    // Asignar espectadores si hay espacio
+    for (final UserModel user in spectators) {
+      while (seatIdx < seatsCount &&
+          (_seatsOfPlanningPoker[seatIdx] != null ||
+              seatIdx == protagonistSeat)) {
+        seatIdx++;
+      }
+      if (seatIdx < seatsCount) {
+        _seatsOfPlanningPoker[seatIdx] = user;
+        seatIdx++;
+      } else {
+        break;
+      }
+    }
+
+    // Debug: imprime los asientos
+    for (int i = 0; i < _seatsOfPlanningPoker.length; i++) {
+      print('Silla $i: ${_seatsOfPlanningPoker[i]?.displayName ?? 'Vacía'}');
+    }
   }
 
   final BlocModal blocModal;

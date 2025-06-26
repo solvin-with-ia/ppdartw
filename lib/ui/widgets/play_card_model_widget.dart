@@ -11,6 +11,7 @@ class PlayCardModelWidget extends StatelessWidget {
   const PlayCardModelWidget({
     required this.user,
     required this.isSpectator,
+    this.selected = false,
     super.key,
     this.cardBackColor = const Color(0xFF6C3EFF),
     this.cardBorderColor = Colors.white,
@@ -20,6 +21,7 @@ class PlayCardModelWidget extends StatelessWidget {
   final bool isSpectator;
   final Color cardBackColor;
   final Color cardBorderColor;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,7 @@ class PlayCardModelWidget extends StatelessWidget {
               width: 36,
               height: 58,
               decoration: BoxDecoration(
-                color: cardBackColor,
+                color: !isSpectator && selected ? cardBackColor : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: cardBorderColor, width: 2),
                 boxShadow: <BoxShadow>[
