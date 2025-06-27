@@ -85,26 +85,45 @@ void main() {
   });
 
   group('selectRoleDraft', () {
-    test('cambia el draft a jugador, pero el rol real no cambia hasta confirmar', () {
-      final Role? antes = blocGame.selectedRole;
-      blocGame.selectRoleDraft(Role.jugador);
-      expect(blocGame.selectedRole, antes);
-      blocGame.confirmRoleSelection();
-      expect(blocGame.selectedRole, Role.jugador);
-    });
+    test(
+      'cambia el draft a jugador, pero el rol real no cambia hasta confirmar',
+      () {
+        final Role? antes = blocGame.selectedRole;
+        blocGame.selectRoleDraft(Role.jugador);
+        expect(blocGame.selectedRole, antes);
+        blocGame.confirmRoleSelection();
+        expect(blocGame.selectedRole, Role.jugador);
+      },
+    );
 
-    test('cambia el draft a espectador, pero el rol real no cambia hasta confirmar', () {
-      final Role? antes = blocGame.selectedRole;
-      blocGame.selectRoleDraft(Role.espectador);
-      expect(blocGame.selectedRole, antes);
-      blocGame.confirmRoleSelection();
-      expect(blocGame.selectedRole, Role.espectador);
-    });
+    test(
+      'cambia el draft a espectador, pero el rol real no cambia hasta confirmar',
+      () {
+        final Role? antes = blocGame.selectedRole;
+        blocGame.selectRoleDraft(Role.espectador);
+        expect(blocGame.selectedRole, antes);
+        blocGame.confirmRoleSelection();
+        expect(blocGame.selectedRole, Role.espectador);
+      },
+    );
 
     test('no afecta el nombre ni otros campos', () {
       final String nombreAntes = blocGame.selectedGame.name;
       blocGame.selectRoleDraft(Role.jugador);
       expect(blocGame.selectedGame.name, nombreAntes);
     });
+  });
+
+  test('roleDraft refleja el valor seleccionado en el draft', () {
+    blocGame.selectRoleDraft(Role.espectador);
+    expect(blocGame.roleDraft, Role.espectador);
+    blocGame.selectRoleDraft(Role.jugador);
+    expect(blocGame.roleDraft, Role.jugador);
+  });
+
+  test('roleDraft vuelve al valor real tras confirmar', () {
+    blocGame.selectRoleDraft(Role.espectador);
+    blocGame.confirmRoleSelection();
+    expect(blocGame.roleDraft, blocGame.selectedRole);
   });
 }
