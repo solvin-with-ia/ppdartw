@@ -126,4 +126,31 @@ void main() {
     blocGame.confirmRoleSelection();
     expect(blocGame.roleDraft, blocGame.selectedRole);
   });
+
+  group('confirmRoleSelection', () {
+    test('confirma el draft y actualiza el rol real', () {
+      blocGame.selectRoleDraft(Role.espectador);
+      blocGame.confirmRoleSelection();
+      expect(blocGame.selectedRole, Role.espectador);
+      expect(blocGame.roleDraft, Role.espectador); // draft limpio, refleja el real
+    });
+
+    test('si no hay draft ni rol, asigna jugador por defecto', () {
+      // Asegúrate de que no hay draft ni rol antes
+      // (en este contexto, al inicio del test, selectedRole es null)
+      blocGame.confirmRoleSelection();
+      expect(blocGame.selectedRole, Role.jugador);
+      expect(blocGame.roleDraft, Role.jugador);
+    });
+
+    test('limpia el draft tras confirmar', () {
+      blocGame.selectRoleDraft(Role.jugador);
+      blocGame.confirmRoleSelection();
+      // Cambiar a espectador, pero no confirmar
+      blocGame.selectRoleDraft(Role.espectador);
+      expect(blocGame.roleDraft, Role.espectador);
+      blocGame.confirmRoleSelection();
+      expect(blocGame.roleDraft, blocGame.selectedRole);
+    });
+  });
 }
