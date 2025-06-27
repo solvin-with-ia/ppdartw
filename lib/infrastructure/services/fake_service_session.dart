@@ -32,4 +32,8 @@ class FakeServiceSession implements ServiceSession {
     _user = null;
     _bloc.value = null;
   }
+
+  void dispose() {
+    _bloc.dispose();
+  }
 }

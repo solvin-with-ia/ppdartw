@@ -84,4 +84,26 @@ class FakeServiceWsDatabase implements ServiceWsDatabase {
     }
     return bloc.stream;
   }
+
+  void dispose() {
+    // 1. Limpia _collections
+    _collections.clear();
+
+    // 2. Recorre todos los BlocGeneral de _docBlocs y llama dispose
+    for (final Map<String, BlocGeneral<Map<String, dynamic>?>> collection
+        in _docBlocs.values) {
+      for (final BlocGeneral<Map<String, dynamic>?> bloc in collection.values) {
+        bloc.dispose();
+      }
+      collection.clear();
+    }
+    _docBlocs.clear();
+
+    // 3. Recorre todos los BlocGeneral de _collectionBlocs y llama dispose
+    for (final BlocGeneral<List<Map<String, dynamic>>> bloc
+        in _collectionBlocs.values) {
+      bloc.dispose();
+    }
+    _collectionBlocs.clear();
+  }
 }
