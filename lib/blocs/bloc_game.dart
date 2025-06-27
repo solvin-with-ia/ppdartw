@@ -10,6 +10,7 @@ import '../domain/usecases/game/create_game_usecase.dart';
 import '../domain/usecases/game/get_game_stream_usecase.dart';
 import '../shared/deck.dart';
 import '../shared/game_deck_utils.dart';
+import '../shared/game_utils.dart';
 import '../ui/modals/name_and_role_modal.dart';
 import '../views/enum_views.dart';
 import 'bloc_modal.dart';
@@ -34,6 +35,8 @@ class BlocGame {
     seatsCount,
     null,
   );
+  Stream<GameModel> get gameStream => _gameBloc.stream;
+  GameModel get selectedGame => _gameBloc.value;
 
   /// Getter público para la UI
   List<UserModel?> get seatsOfPlanningPoker =>
@@ -42,6 +45,13 @@ class BlocGame {
   final GetGameStreamUsecase getGameStreamUsecase;
   StreamSubscription<Either<ErrorItem, GameModel?>>? _gameSubscription;
   final BlocNavigator blocNavigator;
+  final BlocModal blocModal;
+  final BlocSession blocSession;
+  final CreateGameUsecase createGameUsecase;
+
+  final BlocGeneral<GameModel> _gameBloc = BlocGeneral<GameModel>(
+    GameModel.empty(),
+  );
 
   Future<void> init() async {
     await Future<void>.delayed(const Duration(seconds: 3));
@@ -74,17 +84,6 @@ class BlocGame {
       }
     });
   }
-
-  final BlocModal blocModal;
-  final BlocSession blocSession;
-  final CreateGameUsecase createGameUsecase;
-
-  final BlocGeneral<GameModel> _gameBloc = BlocGeneral<GameModel>(
-    GameModel.empty(),
-  );
-
-  Stream<GameModel> get gameStream => _gameBloc.stream;
-  GameModel get selectedGame => _gameBloc.value;
 
   /// Valida si el nombre de la partida es válido según las reglas de negocio (>= 3 caracteres)
   bool get isNameValid => _gameBloc.value.name.trim().length >= 3;
@@ -180,28 +179,7 @@ class BlocGame {
 
   /// Calcula el promedio de los votos revelados (solo cartas numéricas)
   double calculateAverage() {
-    final GameModel game = _gameBloc.value;
-    if (!game.votesRevealed) {
-      return 0;
-    }
-    final List<VoteModel> votes = game.votes;
-    final List<CardModel> deck = game.deck;
-    final List<double> values = votes
-        .map((VoteModel vote) {
-          final CardModel card = deck.firstWhere(
-            (CardModel c) => c.id == vote.cardId,
-            orElse: () =>
-                const CardModel(id: '', display: '', value: 0, description: ''),
-          );
-          return card.value.toDouble();
-        })
-        .whereType<double>()
-        .toList();
-    if (values.isEmpty) {
-      return 0;
-    }
-    final double sum = values.fold(0.0, (double a, double b) => a + b);
-    return sum / values.length;
+    return GameUtils.calculateAverage(_gameBloc.value);
   }
 
   /// Reinicia la ronda: limpia los votos y oculta las cartas

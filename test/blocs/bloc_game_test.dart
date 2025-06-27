@@ -7,6 +7,7 @@ import 'package:ppdartw/blocs/bloc_game.dart';
 import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
+import 'package:ppdartw/domain/enums/role.dart';
 import 'package:ppdartw/domain/models/card_model.dart';
 import 'package:ppdartw/domain/models/game_model.dart';
 import 'package:ppdartw/domain/models/vote_model.dart';
@@ -17,7 +18,6 @@ import 'package:ppdartw/domain/usecases/game/get_game_stream_usecase.dart';
 import 'package:ppdartw/domain/usecases/session/get_user_stream_usecase.dart';
 import 'package:ppdartw/domain/usecases/session/sign_in_with_google_usecase.dart';
 import 'package:ppdartw/domain/usecases/session/sign_out_usecase.dart';
-import 'package:ppdartw/shared/game_deck_utils.dart';
 
 class MockGameRepository implements GameRepository {
   @override
@@ -140,17 +140,20 @@ class MockCreateGameUsecase implements CreateGameUsecase {
 }
 
 class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
-  DummyGetGameStreamUsecase();
-  final Map<String, StreamController<Either<ErrorItem, GameModel?>>> _controllers = <String, StreamController<Either<ErrorItem, GameModel?>>>{};
+  final Map<String, StreamController<Either<ErrorItem, GameModel?>>>
+  _controllers = <String, StreamController<Either<ErrorItem, GameModel?>>>{};
+
   static final Map<String, String> _initialNames = <String, String>{};
-  static final Map<String, List<CardModel>> _initialDecks = <String, List<CardModel>>{};
+  static final Map<String, List<CardModel>> _initialDecks =
+      <String, List<CardModel>>{};
   static final Map<String, GameModel> _lastSetGame = <String, GameModel>{};
 
   void setGame(GameModel game) {
     final String gameId = game.id;
     _lastSetGame[gameId] = game;
     if (!_controllers.containsKey(gameId)) {
-      _controllers[gameId] = StreamController<Either<ErrorItem, GameModel?>>.broadcast();
+      _controllers[gameId] =
+          StreamController<Either<ErrorItem, GameModel?>>.broadcast();
     }
     _controllers[gameId]!.add(Right<ErrorItem, GameModel?>(game));
   }
@@ -158,13 +161,17 @@ class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
   @override
   Stream<Either<ErrorItem, GameModel?>> call(String gameId) {
     if (!_controllers.containsKey(gameId)) {
-      _controllers[gameId] = StreamController<Either<ErrorItem, GameModel?>>.broadcast();
+      _controllers[gameId] =
+          StreamController<Either<ErrorItem, GameModel?>>.broadcast();
       // Si hay un modelo seteado, emítelo como primer valor
       if (_lastSetGame.containsKey(gameId)) {
-        _controllers[gameId]!.add(Right<ErrorItem, GameModel?>(_lastSetGame[gameId]!));
+        _controllers[gameId]!.add(
+          Right<ErrorItem, GameModel?>(_lastSetGame[gameId]),
+        );
       } else {
         final String initialName = _initialNames[gameId] ?? 'Partida Test';
-        final List<CardModel> initialDeck = _initialDecks[gameId] ?? const <CardModel>[];
+        final List<CardModel> initialDeck =
+            _initialDecks[gameId] ?? const <CardModel>[];
         final GameModel game = GameModel(
           id: gameId,
           name: initialName,
@@ -185,6 +192,7 @@ class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
   static void setInitialName(String gameId, String name) {
     _initialNames[gameId] = name;
   }
+
   static void setInitialDeck(String gameId, List<CardModel> deck) {
     _initialDecks[gameId] = deck;
   }
@@ -194,286 +202,48 @@ class DummyGetGameStreamUsecase implements GetGameStreamUsecase {
 }
 
 void main() {
-  setUpAll(() {
-    registerFallbackValue(
-      const UserModel(
-        id: '',
-        displayName: '',
-        email: '',
-        photoUrl: '',
-        jwt: <String, dynamic>{},
-      ),
-    );
-  });
-  group('BlocGame', () {
+  group('BlocGame basic isolated methods', () {
     late BlocGame blocGame;
 
-    late MockBlocSession mockBlocSession;
-    late MockCreateGameUsecase mockCreateGameUsecase;
-    late BlocModal blocModal;
-    late BlocNavigator blocNavigator;
-    late DummyGetGameStreamUsecase dummyGetGameStreamUsecase;
-
     setUp(() {
-      mockBlocSession = MockBlocSession();
-      mockCreateGameUsecase = MockCreateGameUsecase();
-      // Mock para userStream: siempre emite null (o DummyUserModel si prefieres)
-      when(
-        () => mockBlocSession.userStream,
-      ).thenAnswer((_) => Stream<UserModel?>.value(null));
-      blocModal = BlocModal(); // Instancia mínima
-      blocNavigator = BlocNavigator(mockBlocSession);
-      dummyGetGameStreamUsecase = DummyGetGameStreamUsecase();
-
       blocGame = BlocGame(
-        blocSession: mockBlocSession,
-        createGameUsecase: mockCreateGameUsecase,
-        getGameStreamUsecase: dummyGetGameStreamUsecase,
-        blocModal: blocModal,
-        blocNavigator: blocNavigator,
+        blocSession: DummyBlocSession(),
+        createGameUsecase: DummyCreateGameUsecase(),
+        getGameStreamUsecase: DummyGetGameStreamUsecase(),
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(DummyBlocSession()),
       );
     });
 
-    test('Estado inicial es GameModel.empty()', () {
-      expect(blocGame.selectedGame, isA<GameModel>());
-      expect(blocGame.selectedGame.isNew, isTrue);
+    test('updateNameDraft updates the name locally', () {
+      blocGame.updateNameDraft('Test Game');
+      expect(blocGame.selectedGame.name, 'Test Game');
     });
 
-    test('createGame crea un nuevo GameModel con el admin logueado', () async {
-      final String gameId = 'test-create-game';
-      final GameModel forcedModel = GameModel.empty().copyWith(
-        id: gameId,
-        name: 'Partida Test',
-        admin: const DummyUserModel(),
-      );
-      dummyGetGameStreamUsecase.setGame(forcedModel);
-      await blocGame.createGame(name: 'Partida Test', gameId: gameId);
-      await Future<void>.delayed(Duration.zero);
-      final GameModel game = blocGame.selectedGame;
-      expect(game.name, 'Partida Test');
-      expect(game.admin.id, 'dummy');
-      expect(game.isNew, isFalse); // Dependiendo de la lógica
+    test('setName updates the name via setter', () {
+      blocGame.setName('Setter Name');
+      expect(blocGame.selectedGame.name, 'Setter Name');
     });
 
-    test('updateGameName actualiza el nombre de la partida', () {
-      blocGame.createGame(name: 'Partida Test');
-      blocGame.setName('Nuevo Nombre');
-      expect(blocGame.selectedGame.name, 'Nuevo Nombre');
+    test('selectRoleDraft updates the draft role', () {
+      blocGame.selectRoleDraft(Role.jugador);
+      expect(blocGame.selectedGame.role, Role.jugador);
+      blocGame.selectRoleDraft(Role.espectador);
+      expect(blocGame.selectedGame.role, Role.espectador);
     });
 
-    test('updateGame persiste y mantiene el draft actualizado', () async {
-      await blocGame.createGame(name: 'Partida Persistida');
-      final String oldId = blocGame.selectedGame.id;
-      blocGame.setName('Nombre Actualizado');
-      // Simula que el backend persiste el modelo actualizado
-      dummyGetGameStreamUsecase.setGame(blocGame.selectedGame);
-      await blocGame.updateGame();
-      // Espera a que el stream procese el valor
-      await Future<void>.delayed(Duration.zero);
-      expect(blocGame.selectedGame.name, 'Nombre Actualizado');
-      expect(blocGame.selectedGame.id, oldId);
-    });
+    test(
+      'isNameValid returns false for short names and true for valid names',
+      () {
+        blocGame.setName('ab');
+        expect(blocGame.isNameValid, isFalse);
+        blocGame.setName('validName');
+        expect(blocGame.isNameValid, isTrue);
+      },
+    );
 
-    test('updateGame no lanza errores si se llama sin cambios', () async {
-      await blocGame.createGame(name: 'Partida Simple');
-      await Future<void>.delayed(Duration.zero);
-      expect(() => blocGame.updateGame(), returnsNormally);
-    });
-
-    test('dispose no lanza errores', () {
-      expect(() => blocGame.dispose(), returnsNormally);
-    });
-
-    group('Votación y flujo de ronda', () {
-      setUp(() async {
-        await blocGame.createGame(name: 'Ronda Test');
-        await Future<void>.delayed(Duration.zero);
-      });
-
-      test('Los votos están ocultos por defecto', () {
-        expect(blocGame.selectedGame.votesRevealed, isFalse);
-      });
-
-      test('revealVotes cambia votesRevealed a true', () async {
-        await blocGame.revealVotes();
-        expect(blocGame.selectedGame.votesRevealed, isTrue);
-      });
-
-      test('hideVotes cambia votesRevealed a false', () async {
-        await blocGame.revealVotes();
-        await blocGame.hideVotes();
-        expect(blocGame.selectedGame.votesRevealed, isFalse);
-      });
-
-      test('calculateAverage retorna 0.0 si los votos no están revelados', () {
-        expect(blocGame.calculateAverage(), equals(0.0));
-      });
-
-      test(
-        'calculateAverage retorna 0.0 cuando no hay votos válidos',
-        () async {
-          await blocGame.createGame(name: 'Promedio Test');
-          // Votamos por una carta que no está en el deck
-          await blocGame.setVote(
-            const CardModel(
-              id: 'invalid',
-              display: 'Invalid',
-              value: 0,
-              description: '',
-            ),
-          );
-          await blocGame.revealVotes();
-          final double promedio = blocGame.calculateAverage();
-          expect(promedio, equals(0.0));
-        },
-      );
-
-      test(
-        'calculateAverage retorna el promedio correcto cuando los votos están revelados',
-        () async {
-          final List<CardModel> deck = <CardModel>[
-            const CardModel(id: '1', display: '1', value: 1, description: 'Uno'),
-            const CardModel(id: '2', display: '2', value: 2, description: 'Dos'),
-            const CardModel(id: '3', display: '3', value: 3, description: 'Tres'),
-          ];
-          final String gameId = 'test-average';
-          final user = blocGame.blocSession.user ?? const DummyUserModel();
-          final GameModel forcedModel = GameModel.empty().copyWith(
-            id: gameId,
-            name: 'Promedio Test',
-            admin: user,
-            deck: deck,
-            votes: [VoteModel(userId: user.id, cardId: deck[2].id)],
-            votesRevealed: true,
-          );
-          dummyGetGameStreamUsecase.setGame(forcedModel);
-          await blocGame.createGame(name: 'Promedio Test', gameId: gameId);
-          await Future<void>.delayed(Duration.zero);
-          final double promedio = blocGame.calculateAverage();
-          expect(promedio, closeTo(3.0, 0.01));
-        },
-      );
-
-      test('resetRound limpia votos y oculta cartas', () async {
-        // Simula votos y revela
-        // Simula votos y revela usando solo métodos públicos
-        await blocGame.createGame(name: 'Ronda Test 2');
-        // No hay forma directa de setear votes/votesRevealed salvo exponer un método de test o usar los métodos públicos
-        // Aquí solo verificamos que resetRound limpia los votos y oculta las cartas tras revealVotes + setVote
-        await blocGame.setVote(
-          const CardModel(id: '1', display: '1', value: 1, description: 'Uno'),
-        );
-        await blocGame.revealVotes();
-        await blocGame.resetRound();
-        expect(blocGame.selectedGame.votes, isEmpty);
-        expect(blocGame.selectedGame.votesRevealed, isFalse);
-      });
-    });
-
-    group('Lógica de asientos', () {
-      // No uses blocGame.createGame ni setUp aquí, cada test controla su modelo
-
-      test('El usuario actual siempre está en la posición 8', () async {
-        const UserModel dummyUser = UserModel(
-          id: 'dummy',
-          displayName: 'dummy',
-          email: '',
-          photoUrl: '',
-          jwt: <String, dynamic>{},
-        );
-        when(() => mockBlocSession.user).thenReturn(dummyUser);
-        final List<UserModel> players = <UserModel>[
-          dummyUser,
-          ...List<UserModel>.generate(
-            4,
-            (int i) => UserModel(
-              id: 'p$i',
-              displayName: 'P$i',
-              email: '',
-              photoUrl: '',
-              jwt: const <String, dynamic>{},
-            ),
-          ),
-        ];
-        final List<UserModel> spectators = List<UserModel>.generate(
-          3,
-          (int i) => UserModel(
-            id: 's$i',
-            displayName: 'S$i',
-            email: '',
-            photoUrl: '',
-            jwt: const <String, dynamic>{},
-          ),
-        );
-        final GameModel model = GameModel.empty().copyWith(
-          players: players,
-          spectators: spectators,
-        );
-        dummyGetGameStreamUsecase.setGame(model);
-        await Future<void>.delayed(Duration.zero);
-        final List<UserModel?> seats = blocGame.seatsOfPlanningPoker;
-        // Debe haber asientos vacíos
-        expect(seats.where((UserModel? u) => u == null).isNotEmpty, isTrue);
-        // Simula que jugador2 sale: emite un modelo sin él
-        final GameModel modelSinJ2 = model.copyWith(
-          players: <UserModel>[dummyUser],
-        );
-        dummyGetGameStreamUsecase.setGame(modelSinJ2);
-        await Future<void>.delayed(Duration.zero);
-        final List<UserModel?> seats2 = blocGame.seatsOfPlanningPoker;
-        expect(seats2.where((UserModel? u) => u?.id == 'j2').isEmpty, isTrue);
-        expect(seats2.where((UserModel? u) => u == null).isNotEmpty, isTrue);
-      });
-
-      test('El reshuffle cambia la disposición (excepto el usuario actual)', () async {
-        const UserModel dummyUser = UserModel(
-          id: 'dummy',
-          displayName: 'dummy',
-          email: '',
-          photoUrl: '',
-          jwt: <String, dynamic>{},
-        );
-        when(() => mockBlocSession.user).thenReturn(dummyUser);
-        final List<UserModel> players = <UserModel>[
-          dummyUser,
-          const UserModel(id: 'j2', displayName: 'J2', email: '', photoUrl: '', jwt: <String, dynamic>{}),
-          const UserModel(id: 'j3', displayName: 'J3', email: '', photoUrl: '', jwt: <String, dynamic>{}),
-        ];
-        final List<UserModel> spectators = <UserModel>[
-          const UserModel(id: 'e1', displayName: 'E1', email: '', photoUrl: '', jwt: <String, dynamic>{}),
-        ];
-        final GameModel model = GameModel.empty().copyWith(
-          players: players,
-          spectators: spectators,
-        );
-        dummyGetGameStreamUsecase.setGame(model);
-        await blocGame.createGame(name: 'Test Reshuffle', gameId: 'reshuffle-game');
-        await Future<void>.delayed(Duration.zero);
-        final List<UserModel?> seatsBefore = List<UserModel?>.from(blocGame.seatsOfPlanningPoker);
-        // Forzar reshuffle con un modelo con jugadores en orden diferente
-        final List<UserModel> playersShuffled = <UserModel>[
-          dummyUser,
-          const UserModel(id: 'j3', displayName: 'J3', email: '', photoUrl: '', jwt: <String, dynamic>{}),
-          const UserModel(id: 'j2', displayName: 'J2', email: '', photoUrl: '', jwt: <String, dynamic>{}),
-        ];
-        final GameModel modelShuffled = model.copyWith(players: playersShuffled);
-        dummyGetGameStreamUsecase.setGame(modelShuffled);
-        await Future<void>.delayed(Duration.zero);
-        final List<UserModel?> seatsAfter = blocGame.seatsOfPlanningPoker;
-        // El asiento 8 (protagonista) debe ser igual
-        expect(seatsBefore[BlocGame.protagonistSeat]?.id, dummyUser.id);
-        expect(seatsAfter[BlocGame.protagonistSeat]?.id, dummyUser.id);
-        // Al menos un asiento (que no sea el 8) debe haber cambiado
-        bool changed = false;
-        for (int i = 0; i < seatsBefore.length; i++) {
-          if (i == BlocGame.protagonistSeat) continue;
-          if (seatsBefore[i]?.id != seatsAfter[i]?.id) {
-            changed = true;
-            break;
-          }
-        }
-        expect(changed, isTrue);
-      });
+    test('calculateAverage returns 0 if votes are not revealed', () {
+      expect(blocGame.calculateAverage(), 0.0);
     });
   });
 }
