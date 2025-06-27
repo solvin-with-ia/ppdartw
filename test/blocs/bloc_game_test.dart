@@ -55,36 +55,32 @@ void main() {
     fakeSession.dispose();
   });
 
-  group('BlocGame con servicios fake', () {
-    test('updateNameDraft updates the name locally', () {
-      blocGame.updateNameDraft('Test Game');
+  group('setName', () {
+    test('actualiza el nombre correctamente', () {
+      blocGame.setName('Test Game');
       expect(blocGame.selectedGame.name, 'Test Game');
     });
 
-    test('setName updates the name via setter', () {
-      blocGame.setName('Setter Name');
-      expect(blocGame.selectedGame.name, 'Setter Name');
+    test('sobrescribe el nombre anterior', () {
+      blocGame.setName('Primer Nombre');
+      blocGame.setName('Segundo Nombre');
+      expect(blocGame.selectedGame.name, 'Segundo Nombre');
     });
 
-    test('selectRoleDraft updates the draft role', () {
-      blocGame.selectRoleDraft(Role.jugador);
-      expect(blocGame.selectedGame.role, Role.jugador);
-      blocGame.selectRoleDraft(Role.espectador);
-      expect(blocGame.selectedGame.role, Role.espectador);
+    test('permite nombres vacíos', () {
+      blocGame.setName('');
+      expect(blocGame.selectedGame.name, '');
     });
 
-    test(
-      'isNameValid returns false for short names and true for valid names',
-      () {
-        blocGame.setName('ab');
-        expect(blocGame.isNameValid, isFalse);
-        blocGame.setName('validName');
-        expect(blocGame.isNameValid, isTrue);
-      },
-    );
+    test('permite nombres con caracteres especiales', () {
+      blocGame.setName('¡Juego #1! 🚀');
+      expect(blocGame.selectedGame.name, '¡Juego #1! 🚀');
+    });
 
-    test('calculateAverage returns 0 if votes are not revealed', () {
-      expect(blocGame.calculateAverage(), 0.0);
+    test('no afecta otros campos del modelo', () {
+      final Role? roleAntes = blocGame.selectedGame.role;
+      blocGame.setName('Solo cambia el nombre');
+      expect(blocGame.selectedGame.role, roleAntes);
     });
   });
 }

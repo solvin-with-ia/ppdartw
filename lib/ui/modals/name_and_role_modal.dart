@@ -64,7 +64,7 @@ class NameAndRoleModal extends StatelessWidget {
                   CustomInputWidget(
                     label: 'Tu nombre',
                     value: blocGame.selectedGame.name,
-                    onChanged: blocGame.updateNameDraft,
+                    onChanged: blocGame.setName,
                     hintText: 'Ingresa tu nombre',
                   ),
                   const SizedBox(height: 24),

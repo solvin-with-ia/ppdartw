@@ -246,7 +246,7 @@ class BlocGame {
     _gameBloc.value = _gameBloc.value.copyWith(role: role);
   }
 
-  void updateNameDraft(String name) {
+  void setName(String name) {
     _gameBloc.value = _gameBloc.value.copyWith(name: name);
   }
 
@@ -258,10 +258,6 @@ class BlocGame {
   /// Muestra el modal para seleccionar nombre y rol, y gestiona la inscripción reactiva del usuario.
   void showNameAndRoleModal() {
     blocModal.showModal(NameAndRoleModal(blocGame: this));
-  }
-
-  void setName(String newName) {
-    updateNameDraft(newName);
   }
 
   void dispose() {
