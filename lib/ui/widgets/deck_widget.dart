@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
+import 'package:text_responsive/text_responsive.dart';
 
 import '../../blocs/bloc_game.dart';
 import '../../domain/models/card_model.dart';
 import '../../domain/models/game_model.dart';
 import '../../domain/models/vote_model.dart';
 import 'card_model_widget.dart';
-// Si inline_text_widget.dart no existe, usa Text en su lugar.
 
 class DeckWidget extends StatelessWidget {
   const DeckWidget({
     required this.blocGame,
     super.key,
-    this.title = 'Elige una carta ',
+    this.title = 'Elige una carta 👇',
     this.height = 126,
     this.cardHeight = 90,
     this.spacing = 12,
@@ -50,7 +50,7 @@ class DeckWidget extends StatelessWidget {
                 SizedBox(
                   height: 21,
                   width: width,
-                  child: Text(
+                  child: InlineTextWidget(
                     title,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: Colors.white,
