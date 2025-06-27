@@ -132,7 +132,10 @@ void main() {
       blocGame.selectRoleDraft(Role.espectador);
       blocGame.confirmRoleSelection();
       expect(blocGame.selectedRole, Role.espectador);
-      expect(blocGame.roleDraft, Role.espectador); // draft limpio, refleja el real
+      expect(
+        blocGame.roleDraft,
+        Role.espectador,
+      ); // draft limpio, refleja el real
     });
 
     test('si no hay draft ni rol, asigna jugador por defecto', () {
@@ -151,6 +154,22 @@ void main() {
       expect(blocGame.roleDraft, Role.espectador);
       blocGame.confirmRoleSelection();
       expect(blocGame.roleDraft, blocGame.selectedRole);
+    });
+  });
+  group('showNameAndRoleModal', () {
+    test('muestra el modal de nombre y rol', () {
+      // Asegura que el modal no está visible al inicio
+      expect(blocGame.blocModal.isShowing, isFalse);
+      blocGame.showNameAndRoleModal();
+      expect(blocGame.blocModal.isShowing, isTrue);
+      // El widget mostrado debe ser NameAndRoleModal
+      expect(
+        blocGame.blocModal.currentModal?.runtimeType.toString(),
+        contains('NameAndRoleModal'),
+      );
+      // Oculta el modal para limpiar estado
+      blocGame.blocModal.hideModal();
+      expect(blocGame.blocModal.isShowing, isFalse);
     });
   });
 }

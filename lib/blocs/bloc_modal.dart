@@ -12,6 +12,8 @@ class BlocModal {
   /// Indica si hay un modal visible actualmente
   bool get isShowing => _controller.value != null;
 
+  Widget? get currentModal => _controller.value;
+
   void showModal(Widget widget) {
     if (_controller.value == null) {
       _controller.value = widget;
