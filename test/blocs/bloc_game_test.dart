@@ -83,4 +83,22 @@ void main() {
       expect(blocGame.selectedGame.role, roleAntes);
     });
   });
+
+  group('selectRoleDraft', () {
+    test('cambia el rol a jugador', () {
+      blocGame.selectRoleDraft(Role.jugador);
+      expect(blocGame.selectedGame.role, Role.jugador);
+    });
+
+    test('cambia el rol a espectador', () {
+      blocGame.selectRoleDraft(Role.espectador);
+      expect(blocGame.selectedGame.role, Role.espectador);
+    });
+
+    test('no afecta el nombre ni otros campos', () {
+      final String nombreAntes = blocGame.selectedGame.name;
+      blocGame.selectRoleDraft(Role.jugador);
+      expect(blocGame.selectedGame.name, nombreAntes);
+    });
+  });
 }
