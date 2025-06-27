@@ -14,6 +14,7 @@ class FakeServiceSession implements ServiceSession {
 
   @override
   Future<UserModel?> signInWithGoogle() async {
+    await Future<void>.delayed(const Duration(seconds: 3));
     // Simula un usuario autenticado
     _user = const UserModel(
       id: 'fake_user',

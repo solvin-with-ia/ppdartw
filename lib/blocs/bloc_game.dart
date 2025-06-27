@@ -54,7 +54,6 @@ class BlocGame {
   );
 
   Future<void> init() async {
-    await Future<void>.delayed(const Duration(seconds: 3));
     await blocSession.signInWithGoogleUsecase.call();
     blocNavigator.goTo(EnumViews.createGame);
     // Navegación reactiva según el estado del juego
