@@ -78,21 +78,27 @@ void main() {
     });
 
     test('no afecta otros campos del modelo', () {
-      final Role? roleAntes = blocGame.selectedGame.role;
+      final Role? roleAntes = blocGame.selectedRole;
       blocGame.setName('Solo cambia el nombre');
-      expect(blocGame.selectedGame.role, roleAntes);
+      expect(blocGame.selectedRole, roleAntes);
     });
   });
 
   group('selectRoleDraft', () {
-    test('cambia el rol a jugador', () {
+    test('cambia el draft a jugador, pero el rol real no cambia hasta confirmar', () {
+      final Role? antes = blocGame.selectedRole;
       blocGame.selectRoleDraft(Role.jugador);
-      expect(blocGame.selectedGame.role, Role.jugador);
+      expect(blocGame.selectedRole, antes);
+      blocGame.confirmRoleSelection();
+      expect(blocGame.selectedRole, Role.jugador);
     });
 
-    test('cambia el rol a espectador', () {
+    test('cambia el draft a espectador, pero el rol real no cambia hasta confirmar', () {
+      final Role? antes = blocGame.selectedRole;
       blocGame.selectRoleDraft(Role.espectador);
-      expect(blocGame.selectedGame.role, Role.espectador);
+      expect(blocGame.selectedRole, antes);
+      blocGame.confirmRoleSelection();
+      expect(blocGame.selectedRole, Role.espectador);
     });
 
     test('no afecta el nombre ni otros campos', () {

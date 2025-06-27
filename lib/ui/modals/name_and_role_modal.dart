@@ -74,14 +74,14 @@ class NameAndRoleModal extends StatelessWidget {
                       _RoleRadio(
                         label: 'Jugador',
                         value: Role.jugador,
-                        groupValue: blocGame.selectedRole,
+                        groupValue: blocGame.roleDraft,
                         onChanged: blocGame.selectRoleDraft,
                       ),
                       const SizedBox(width: 32),
                       _RoleRadio(
                         label: 'Espectador',
                         value: Role.espectador,
-                        groupValue: blocGame.selectedRole,
+                        groupValue: blocGame.roleDraft,
                         onChanged: blocGame.selectRoleDraft,
                       ),
                     ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-import '../enums/role.dart';
+
 import 'card_model.dart';
 import 'model_utils.dart';
 import 'vote_model.dart';
@@ -24,7 +24,7 @@ class GameModel {
     this.currentStory,
     this.stories = const <String>[],
     this.revealTimeout,
-    this.role = Role.jugador,
+
     this.votesRevealed = false,
   });
 
@@ -73,7 +73,7 @@ class GameModel {
         true, // null o cualquier valor que no sea true será false
   );
   final bool votesRevealed;
-  final Role? role;
+
   final bool isNew;
   // ...
   GameModel copyWith({
@@ -88,7 +88,7 @@ class GameModel {
     List<CardModel>? deck,
     DateTime? finishedAt,
     bool? isNew,
-    Role? role,
+
     bool? votesRevealed,
   }) {
     return GameModel(
@@ -103,7 +103,7 @@ class GameModel {
       deck: deck ?? this.deck,
       finishedAt: finishedAt ?? this.finishedAt,
       isNew: isNew ?? this.isNew,
-      role: role ?? this.role,
+
       votesRevealed: votesRevealed ?? this.votesRevealed,
     );
   }

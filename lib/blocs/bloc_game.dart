@@ -162,7 +162,20 @@ class BlocGame {
     });
   }
 
-  Role? get selectedRole => _gameBloc.value.role;
+  /// Determina el rol del usuario actual por pertenencia a las listas.
+  Role? get selectedRole {
+    final UserModel? user = blocSession.user;
+    if (user == null) {
+      return null;
+    }
+    if (_gameBloc.value.players.any((UserModel u) => u.id == user.id)) {
+      return Role.jugador;
+    }
+    if (_gameBloc.value.spectators.any((UserModel u) => u.id == user.id)) {
+      return Role.espectador;
+    }
+    return null;
+  }
 
   /// Revela los votos (cartas) de todos los jugadores
   Future<void> revealVotes() async {
@@ -227,7 +240,6 @@ class BlocGame {
     _gameBloc.value = game.copyWith(
       players: updatedPlayers,
       spectators: updatedSpectators,
-      role: role,
     );
     await updateGame();
   }
@@ -242,8 +254,15 @@ class BlocGame {
     await setUserRole(user: user, role: role);
   }
 
+  Role? _roleDraft;
+  Role? get roleDraft => _roleDraft ?? selectedRole;
+
   void selectRoleDraft(Role role) {
-    _gameBloc.value = _gameBloc.value.copyWith(role: role);
+    // unicamente para disparar el evento de cambio de rol
+    _gameBloc.value = selectedGame;
+    if (_roleDraft != role) {
+      _roleDraft = role;
+    }
   }
 
   void setName(String name) {
@@ -251,8 +270,10 @@ class BlocGame {
   }
 
   void confirmRoleSelection() {
-    setCurrentUserRole(selectedRole ?? Role.jugador);
+    final Role roleToSet = _roleDraft ?? selectedRole ?? Role.jugador;
+    setCurrentUserRole(roleToSet);
     blocModal.hideModal();
+    _roleDraft = null;
   }
 
   /// Muestra el modal para seleccionar nombre y rol, y gestiona la inscripción reactiva del usuario.
