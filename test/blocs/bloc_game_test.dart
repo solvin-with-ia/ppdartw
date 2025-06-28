@@ -159,6 +159,110 @@ void main() {
     });
   });
 
+  group('createGame', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    test('crea un juego con nombre válido', () async {
+      await blocGame.createGame(name: 'Nueva Partida');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.selectedGame.name, 'Nueva Partida');
+      expect(blocGame.selectedGame.id.isNotEmpty, isTrue);
+    });
+    test('el id generado no es vacío y es único', () async {
+      await blocGame.createGame(name: 'Partida 1');
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final String id1 = blocGame.selectedGame.id;
+      await blocGame.createGame(name: 'Partida 2');
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final String id2 = blocGame.selectedGame.id;
+      expect(id1, isNotEmpty);
+      expect(id2, isNotEmpty);
+      expect(id1, isNot(equals(id2)));
+    });
+    test('el usuario autenticado está en la lista de players', () async {
+      await blocGame.createGame(name: 'Partida con Usuario');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      final String userId = fakeSession.currentUser!.id;
+      expect(
+        blocGame.selectedGame.players.any((UserModel u) => u.id == userId),
+        isTrue,
+      );
+    });
+    test('isNameValid es false si el nombre es menor a 3 caracteres', () async {
+      blocGame.setName('ab');
+      expect(blocGame.isNameValid, isFalse);
+      blocGame.setName('abc');
+      expect(blocGame.isNameValid, isTrue);
+    });
+  });
+
+  group('createMyGame', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    test('crea un juego válido con el nombre actual', () async {
+      blocGame.setName('Partida MyGame');
+      await blocGame.createMyGame();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.selectedGame.name, 'Partida MyGame');
+      expect(blocGame.selectedGame.id.isNotEmpty, isTrue);
+    });
+    test('muestra el modal de nombre y rol tras crear', () async {
+      blocGame.setName('Partida Modal');
+      await blocGame.createMyGame();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.blocModal.isShowing, isTrue);
+      expect(
+        blocGame.blocModal.currentModal?.runtimeType.toString(),
+        contains('NameAndRoleModal'),
+      );
+    });
+    test('el usuario autenticado está en players tras crearMyGame', () async {
+      blocGame.setName('Partida con Usuario');
+      await blocGame.createMyGame();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      final String userId = fakeSession.currentUser!.id;
+      expect(
+        blocGame.selectedGame.players.any((UserModel u) => u.id == userId),
+        isTrue,
+      );
+    });
+    test('el id es único si se llama varias veces', () async {
+      blocGame.setName('Partida 1');
+      await blocGame.createMyGame();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      final String id1 = blocGame.selectedGame.id;
+      blocGame.setName('Partida 2');
+      await blocGame.createMyGame();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      final String id2 = blocGame.selectedGame.id;
+      expect(id1, isNotEmpty);
+      expect(id2, isNotEmpty);
+      expect(id1, isNot(equals(id2)));
+    });
+  });
+
   group('gameStream', () {
     setUp(() async {
       if (fakeSession.currentUser == null) {
