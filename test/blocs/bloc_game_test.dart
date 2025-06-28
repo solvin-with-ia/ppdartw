@@ -159,6 +159,62 @@ void main() {
     });
   });
 
+  group('gameStream', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    test('emite GameModel.empty al inicializar', () async {
+      expect(
+        blocGame.gameStream,
+        emits(
+          predicate<GameModel>(
+            (GameModel game) => game.id == '' && game.name == '',
+          ),
+        ),
+      );
+    });
+    test('emite el modelo tras crear un juego', () async {
+      await blocGame.createGame(name: 'Stream Test');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(
+        blocGame.gameStream,
+        emits(
+          predicate<GameModel>((GameModel game) => game.name == 'Stream Test'),
+        ),
+      );
+    });
+    test('emite el nuevo estado cuando se actualiza en fakeDb', () async {
+      await blocGame.createGame(name: 'Stream Test');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      final String gameId = blocGame.selectedGame.id;
+      const String nuevoNombre = 'Stream Modificado';
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        name: nuevoNombre,
+      );
+      final List<Matcher> expectedStates = <Matcher>[
+        predicate<GameModel>((GameModel game) => game.name == 'Stream Test'),
+        predicate<GameModel>((GameModel game) => game.name == nuevoNombre),
+      ];
+      // Escucha el stream y espera los dos estados
+      expectLater(blocGame.gameStream, emitsInOrder(expectedStates));
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: gameId,
+        data: modificado.toJson(),
+      );
+    });
+  });
+
   group('selectedGame', () {
     setUp(() async {
       if (fakeSession.currentUser == null) {
