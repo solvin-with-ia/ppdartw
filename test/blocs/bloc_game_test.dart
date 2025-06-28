@@ -5,7 +5,9 @@ import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
 import 'package:ppdartw/domain/enums/role.dart';
+import 'package:ppdartw/domain/models/card_model.dart';
 import 'package:ppdartw/domain/models/game_model.dart';
+import 'package:ppdartw/domain/models/vote_model.dart';
 import 'package:ppdartw/domain/repositories/game_repository.dart';
 import 'package:ppdartw/domain/repositories/session_repository.dart';
 import 'package:ppdartw/domain/usecases/game/create_game_usecase.dart';
@@ -279,7 +281,10 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 200));
     });
     test('asigna correctamente el rol de jugador', () async {
-      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.jugador);
+      await blocGame.setUserRole(
+        user: fakeSession.currentUser!,
+        role: Role.jugador,
+      );
       await Future<void>.delayed(const Duration(milliseconds: 150));
       expect(blocGame.selectedRole, Role.jugador);
       final String userId = fakeSession.currentUser!.id;
@@ -293,7 +298,10 @@ void main() {
       );
     });
     test('asigna correctamente el rol de espectador', () async {
-      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.espectador);
+      await blocGame.setUserRole(
+        user: fakeSession.currentUser!,
+        role: Role.espectador,
+      );
       await Future<void>.delayed(const Duration(milliseconds: 150));
       expect(blocGame.selectedRole, Role.espectador);
       final String userId = fakeSession.currentUser!.id;
@@ -307,10 +315,16 @@ void main() {
       );
     });
     test('los cambios de rol son reactivos en selectedRole', () async {
-      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.jugador);
+      await blocGame.setUserRole(
+        user: fakeSession.currentUser!,
+        role: Role.jugador,
+      );
       await Future<void>.delayed(const Duration(milliseconds: 100));
       expect(blocGame.selectedRole, Role.jugador);
-      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.espectador);
+      await blocGame.setUserRole(
+        user: fakeSession.currentUser!,
+        role: Role.espectador,
+      );
       await Future<void>.delayed(const Duration(milliseconds: 100));
       expect(blocGame.selectedRole, Role.espectador);
     });
@@ -507,6 +521,130 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 200));
       // Verifica que el usuario vuelve a estar disponible
       expect(fakeSession.currentUser, isNotNull);
+    });
+  });
+
+  group('setVote', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await blocGame.createGame(name: 'Partida Votos');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    test('un usuario puede votar y el voto aparece en votes', () async {
+      const CardModel card = CardModel(
+        id: 'carta1',
+        display: '5',
+        value: 5,
+        description: 'Cinco',
+      );
+      await blocGame.setVote(card);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      final String userId = fakeSession.currentUser!.id;
+      expect(
+        blocGame.selectedGame.votes.any(
+          (VoteModel v) => v.userId == userId && v.cardId == card.id,
+        ),
+        isTrue,
+      );
+    });
+    test('si vota de nuevo reemplaza su voto', () async {
+      const CardModel card1 = CardModel(
+        id: 'carta1',
+        display: '5',
+        value: 5,
+        description: 'Cinco',
+      );
+      const CardModel card2 = CardModel(
+        id: 'carta2',
+        display: '8',
+        value: 8,
+        description: 'Ocho',
+      );
+      await blocGame.setVote(card1);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await blocGame.setVote(card2);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      final String userId = fakeSession.currentUser!.id;
+      expect(
+        blocGame.selectedGame.votes
+            .where((VoteModel v) => v.userId == userId)
+            .length,
+        1,
+      );
+      expect(
+        blocGame.selectedGame.votes.any(
+          (VoteModel v) => v.userId == userId && v.cardId == card2.id,
+        ),
+        isTrue,
+      );
+    });
+    test('no vota si no hay usuario autenticado', () async {
+      await blocGame.blocSession.signOut();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      const CardModel card = CardModel(
+        id: 'carta1',
+        display: '5',
+        value: 5,
+        description: 'Cinco',
+      );
+      await blocGame.setVote(card);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(blocGame.selectedGame.votes.isEmpty, isTrue);
+    });
+  });
+
+  group('revealVotes', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await blocGame.createGame(name: 'Partida Reveal');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    test('votesRevealed es false inicialmente', () async {
+      expect(blocGame.selectedGame.votesRevealed, isFalse);
+    });
+    test('revealVotes cambia votesRevealed a true y persiste', () async {
+      await blocGame.revealVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(blocGame.selectedGame.votesRevealed, isTrue);
+    });
+    test('revealVotes no afecta los votos existentes', () async {
+      const CardModel card = CardModel(
+        id: 'carta1',
+        display: '5',
+        value: 5,
+        description: 'Cinco',
+      );
+      await blocGame.setVote(card);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final List<VoteModel> votosAntes = List<VoteModel>.from(blocGame.selectedGame.votes);
+      await blocGame.revealVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedGame.votes, votosAntes);
+    });
+    test('revealVotes es idempotente (puede llamarse varias veces)', () async {
+      await blocGame.revealVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await blocGame.revealVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(blocGame.selectedGame.votesRevealed, isTrue);
     });
   });
 

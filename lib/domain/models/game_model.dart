@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 
-
 import 'card_model.dart';
 import 'model_utils.dart';
 import 'vote_model.dart';
@@ -68,9 +67,7 @@ class GameModel {
         : Utils.convertJsonToList(json['stories']?.toString() ?? ''),
     deck: convertJsonToModelList<CardModel>(json['deck'], CardModel.fromJson),
     revealTimeout: json['revealTimeout'] as int?,
-    votesRevealed:
-        json['votesRevealed'] ==
-        true, // null o cualquier valor que no sea true será false
+    votesRevealed: json['votesRevealed'] == true,
   );
   final bool votesRevealed;
 
@@ -137,6 +134,7 @@ class GameModel {
       'stories': stories,
       'deck': deck.map((CardModel c) => c.toJson()).toList(),
       'revealTimeout': revealTimeout,
+      'votesRevealed': votesRevealed,
     };
   }
 }
