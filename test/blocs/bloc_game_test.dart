@@ -634,7 +634,9 @@ void main() {
       );
       await blocGame.setVote(card);
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      final List<VoteModel> votosAntes = List<VoteModel>.from(blocGame.selectedGame.votes);
+      final List<VoteModel> votosAntes = List<VoteModel>.from(
+        blocGame.selectedGame.votes,
+      );
       await blocGame.revealVotes();
       await Future<void>.delayed(const Duration(milliseconds: 100));
       expect(blocGame.selectedGame.votes, votosAntes);
@@ -645,6 +647,116 @@ void main() {
       await blocGame.revealVotes();
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(blocGame.selectedGame.votesRevealed, isTrue);
+    });
+  });
+
+  group('hideVotes', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await blocGame.createGame(name: 'Partida Hide');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      await blocGame.revealVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    test('votesRevealed es true tras revealVotes', () async {
+      expect(blocGame.selectedGame.votesRevealed, isTrue);
+    });
+    test('hideVotes cambia votesRevealed a false y persiste', () async {
+      await blocGame.hideVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(blocGame.selectedGame.votesRevealed, isFalse);
+    });
+    test('hideVotes no afecta los votos existentes', () async {
+      const CardModel card = CardModel(
+        id: 'carta1',
+        display: '5',
+        value: 5,
+        description: 'Cinco',
+      );
+      await blocGame.setVote(card);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final List<VoteModel> votosAntes = List<VoteModel>.from(
+        blocGame.selectedGame.votes,
+      );
+      await blocGame.hideVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedGame.votes, votosAntes);
+    });
+    test('hideVotes es idempotente (puede llamarse varias veces)', () async {
+      await blocGame.hideVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await blocGame.hideVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(blocGame.selectedGame.votesRevealed, isFalse);
+    });
+  });
+
+  group('resetRound', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await blocGame.createGame(name: 'Partida Reset');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      await blocGame.setVote(
+        const CardModel(
+          id: 'carta1',
+          display: '5',
+          value: 5,
+          description: 'Cinco',
+        ),
+      );
+      await blocGame.revealVotes();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    test('limpia los votos', () async {
+      expect(blocGame.selectedGame.votes.isNotEmpty, isTrue);
+      await blocGame.resetRound();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedGame.votes.isEmpty, isTrue);
+    });
+    test('pone votesRevealed en false', () async {
+      expect(blocGame.selectedGame.votesRevealed, isTrue);
+      await blocGame.resetRound();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedGame.votesRevealed, isFalse);
+    });
+    test('no afecta otros campos relevantes', () async {
+      final String nombreAntes = blocGame.selectedGame.name;
+      final List<UserModel> jugadoresAntes = List<UserModel>.from(
+        blocGame.selectedGame.players,
+      );
+      await blocGame.resetRound();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedGame.name, nombreAntes);
+      expect(
+        blocGame.selectedGame.players.map((UserModel u) => u.id).toList(),
+        equals(jugadoresAntes.map((UserModel u) => u.id).toList()),
+      );
+    });
+    test('es idempotente (puede llamarse varias veces)', () async {
+      await blocGame.resetRound();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await blocGame.resetRound();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(blocGame.selectedGame.votes.isEmpty, isTrue);
+      expect(blocGame.selectedGame.votesRevealed, isFalse);
     });
   });
 
