@@ -263,6 +263,59 @@ void main() {
     });
   });
 
+  group('setUserRole', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await blocGame.createGame(name: 'Partida Roles');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    test('asigna correctamente el rol de jugador', () async {
+      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.jugador);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(blocGame.selectedRole, Role.jugador);
+      final String userId = fakeSession.currentUser!.id;
+      expect(
+        blocGame.selectedGame.players.any((UserModel u) => u.id == userId),
+        isTrue,
+      );
+      expect(
+        blocGame.selectedGame.spectators.any((UserModel u) => u.id == userId),
+        isFalse,
+      );
+    });
+    test('asigna correctamente el rol de espectador', () async {
+      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.espectador);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(blocGame.selectedRole, Role.espectador);
+      final String userId = fakeSession.currentUser!.id;
+      expect(
+        blocGame.selectedGame.spectators.any((UserModel u) => u.id == userId),
+        isTrue,
+      );
+      expect(
+        blocGame.selectedGame.players.any((UserModel u) => u.id == userId),
+        isFalse,
+      );
+    });
+    test('los cambios de rol son reactivos en selectedRole', () async {
+      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.jugador);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedRole, Role.jugador);
+      await blocGame.setUserRole(user: fakeSession.currentUser!, role: Role.espectador);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(blocGame.selectedRole, Role.espectador);
+    });
+  });
+
   group('gameStream', () {
     setUp(() async {
       if (fakeSession.currentUser == null) {
