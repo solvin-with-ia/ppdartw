@@ -760,6 +760,73 @@ void main() {
     });
   });
 
+  group('updateGame', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await blocGame.createGame(name: 'Partida Update');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    });
+    test('persiste cambios de nombre en el backend', () async {
+      blocGame.setName('Nuevo Nombre');
+      await blocGame.updateGame();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      // Forzamos reload desde el backend
+      final String id = blocGame.selectedGame.id;
+      final Map<String, dynamic>? gameReloaded = await fakeDb.readDocument(
+        collection: 'games',
+        docId: id,
+      );
+      expect(gameReloaded!['name'], 'Nuevo Nombre');
+    });
+    test('persiste votos y votesRevealed', () async {
+      const CardModel card = CardModel(
+        id: 'carta1',
+        display: '5',
+        value: 5,
+        description: 'Cinco',
+      );
+      await blocGame.setVote(card);
+      await blocGame.revealVotes();
+      await blocGame.updateGame();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final String id = blocGame.selectedGame.id;
+      final Map<String, dynamic>? gameReloaded = await fakeDb.readDocument(
+        collection: 'games',
+        docId: id,
+      );
+      expect(gameReloaded!['votesRevealed'], true);
+      expect(
+        (gameReloaded['votes'] as List<Map<String, dynamic>>).any(
+          (Map<String, dynamic> v) => v['cardId'] == 'carta1',
+        ),
+        isTrue,
+      );
+    });
+    test('es idempotente si no hay cambios', () async {
+      final String idAntes = blocGame.selectedGame.id;
+      await blocGame.updateGame();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final String idDespues = blocGame.selectedGame.id;
+      expect(idDespues, idAntes);
+    });
+    test('si el id cambia, se resuscribe correctamente', () async {
+      final String idAntes = blocGame.selectedGame.id;
+      // Simula cambio de id (nuevo juego)
+      await blocGame.createGame(name: 'Nuevo Juego', gameId: 'nuevo_id');
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(blocGame.selectedGame.id, isNot(idAntes));
+    });
+  });
+
   group('showNameAndRoleModal', () {
     test('muestra el modal de nombre y rol', () {
       // Asegura que el modal no está visible al inicio
