@@ -159,6 +159,57 @@ void main() {
     });
   });
 
+  group('selectedGame', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      // Limpia el juego antes de cada test
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    });
+    test('devuelve GameModel.empty al inicializar', () {
+      expect(blocGame.selectedGame.id, '');
+      expect(blocGame.selectedGame.name, '');
+      expect(blocGame.selectedGame.players, isEmpty);
+      expect(blocGame.selectedGame.spectators, isEmpty);
+    });
+    test('refleja el juego creado', () async {
+      await blocGame.createGame(name: 'Partida BlocTest');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.selectedGame.id.isNotEmpty, isTrue);
+      expect(blocGame.selectedGame.name, 'Partida BlocTest');
+      expect(
+        blocGame.selectedGame.players.any(
+          (UserModel u) => u.id == fakeSession.currentUser!.id,
+        ),
+        isTrue,
+      );
+    });
+    test('se actualiza cuando se guarda un nuevo estado en fakeDb', () async {
+      await blocGame.createGame(name: 'Partida BlocTest');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      final String gameId = blocGame.selectedGame.id;
+      const String nuevoNombre = 'Partida Modificada';
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        name: nuevoNombre,
+      );
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: gameId,
+        data: modificado.toJson(),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.selectedGame.name, nuevoNombre);
+    });
+  });
+
   group('selectedRole', () {
     setUp(() async {
       if (fakeSession.currentUser == null) {
