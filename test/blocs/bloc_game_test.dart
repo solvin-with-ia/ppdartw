@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
 import 'package:ppdartw/blocs/bloc_modal.dart';
 import 'package:ppdartw/blocs/bloc_navigator.dart';
 import 'package:ppdartw/blocs/bloc_session.dart';
 import 'package:ppdartw/domain/enums/role.dart';
+import 'package:ppdartw/domain/models/game_model.dart';
 import 'package:ppdartw/domain/repositories/game_repository.dart';
 import 'package:ppdartw/domain/repositories/session_repository.dart';
 import 'package:ppdartw/domain/usecases/game/create_game_usecase.dart';
@@ -156,6 +158,94 @@ void main() {
       expect(blocGame.roleDraft, blocGame.selectedRole);
     });
   });
+
+  group('selectedRole', () {
+    setUp(() async {
+      if (fakeSession.currentUser == null) {
+        await fakeSession.signInWithGoogle();
+      }
+      // Crea un juego realista y espera a la suscripción
+      await blocGame.createGame(name: 'Test Game');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.selectedGame.id.isNotEmpty, isTrue);
+    });
+    test(
+      'reactivo: devuelve Role.jugador si el usuario está en players',
+      () async {
+        if (fakeSession.currentUser == null) {
+          await fakeSession.signInWithGoogle();
+        }
+        final UserModel user = fakeSession.currentUser!;
+        final String gameId = blocGame.selectedGame.id;
+        final GameModel playersGame = blocGame.selectedGame.copyWith(
+          players: <UserModel>[user],
+          spectators: <UserModel>[],
+        );
+        await fakeDb.saveDocument(
+          collection: 'games',
+          docId: gameId,
+          data: playersGame.toJson(),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        expect(blocGame.selectedRole, Role.jugador);
+      },
+    );
+
+    test(
+      'reactivo: devuelve Role.espectador si el usuario está en spectators',
+      () async {
+        if (fakeSession.currentUser == null) {
+          await fakeSession.signInWithGoogle();
+        }
+        final UserModel user = fakeSession.currentUser!;
+        final String gameId = blocGame.selectedGame.id;
+        final GameModel spectatorsGame = blocGame.selectedGame.copyWith(
+          players: <UserModel>[],
+          spectators: <UserModel>[user],
+        );
+        await fakeDb.saveDocument(
+          collection: 'games',
+          docId: gameId,
+          data: spectatorsGame.toJson(),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        expect(blocGame.selectedRole, Role.espectador);
+      },
+    );
+
+    test(
+      'reactivo: devuelve null si el usuario no está en ninguna lista',
+      () async {
+        if (fakeSession.currentUser == null) {
+          await fakeSession.signInWithGoogle();
+        }
+        final String gameId = blocGame.selectedGame.id;
+        final GameModel noneGame = blocGame.selectedGame.copyWith(
+          players: <UserModel>[],
+          spectators: <UserModel>[],
+        );
+        await fakeDb.saveDocument(
+          collection: 'games',
+          docId: gameId,
+          data: noneGame.toJson(),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        expect(blocGame.selectedRole, isNull);
+      },
+    );
+
+    test('devuelve null si no hay usuario en sesión', () async {
+      await blocGame.blocSession.signOut();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(blocGame.selectedRole, isNull);
+      // Simula usuario nuevamente
+      await fakeSession.signInWithGoogle();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      // Verifica que el usuario vuelve a estar disponible
+      expect(fakeSession.currentUser, isNotNull);
+    });
+  });
+
   group('showNameAndRoleModal', () {
     test('muestra el modal de nombre y rol', () {
       // Asegura que el modal no está visible al inicio
