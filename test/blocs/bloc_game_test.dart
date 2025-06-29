@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import 'package:ppdartw/blocs/bloc_game.dart';
@@ -21,6 +22,7 @@ import 'package:ppdartw/infrastructure/repositories/game_repository_impl.dart';
 import 'package:ppdartw/infrastructure/repositories/session_repository_impl.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_session.dart';
 import 'package:ppdartw/infrastructure/services/fake_service_ws_database.dart';
+import 'package:ppdartw/views/enum_views.dart';
 
 void main() {
   late BlocGame blocGame;
@@ -841,6 +843,118 @@ void main() {
       // Oculta el modal para limpiar estado
       blocGame.blocModal.hideModal();
       expect(blocGame.blocModal.isShowing, isFalse);
+    });
+  });
+
+  Future<void> waitForView(
+    BlocNavigator navigator,
+    EnumViews expected, {
+    Duration timeout = const Duration(seconds: 2),
+  }) async {
+    final Completer<void> completer = Completer<void>();
+    final StreamSubscription<EnumViews> sub = navigator.viewStream.listen((
+      EnumViews view,
+    ) {
+      if (view == expected) {
+        completer.complete();
+      }
+    });
+    if (navigator.currentView == expected) {
+      await sub.cancel();
+      return;
+    }
+    await completer.future.timeout(
+      timeout,
+      onTimeout: () {
+        sub.cancel();
+        throw Exception('Timeout esperando vista $expected');
+      },
+    );
+    await sub.cancel();
+  }
+
+  // NOTA IMPORTANTE:
+  // Para que los tests de navegación sean deterministas y reflejen el flujo real,
+  // primero se debe crear el BlocGame (lo que instala los listeners sobre el userStream),
+  // y luego ejecutar el login (signInWithGoogle). Así el listener reacciona y navega.
+  // Si se hace el login antes de crear el bloc, el stream no emite y la navegación no ocurre.
+  group('init', () {
+    setUp(() async {
+      // Asegura que no haya usuario antes de cada test
+      await fakeSession.signOut();
+      expect(fakeSession.currentUser, isNull);
+      expect(blocSession.user, isNull);
+    });
+
+    test('setup asegura usuario activo', () async {
+      await fakeSession.signInWithGoogle();
+      expect(fakeSession.currentUser, isNotNull);
+      expect(blocSession.user, isNotNull);
+    });
+
+    test('navega a createGame tras iniciar sesión y no haber juego', () async {
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await fakeSession.signInWithGoogle();
+      if (blocGame.blocNavigator.currentView != EnumViews.createGame) {
+        await waitForView(blocGame.blocNavigator, EnumViews.createGame);
+      }
+      expect(blocGame.blocNavigator.currentView, EnumViews.createGame);
+    });
+
+    test('navega a centralStage si usuario y juego están presentes', () async {
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await fakeSession.signInWithGoogle();
+      await blocGame.createGame(name: 'Partida Init');
+      if (blocGame.blocNavigator.currentView != EnumViews.centralStage) {
+        await waitForView(blocGame.blocNavigator, EnumViews.centralStage);
+      }
+      expect(blocGame.blocNavigator.currentView, EnumViews.centralStage);
+    });
+
+    test('navega a splash si el usuario se desconecta', () async {
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await fakeSession.signInWithGoogle();
+      await fakeSession.signOut();
+      if (blocGame.blocNavigator.currentView != EnumViews.splash) {
+        await waitForView(blocGame.blocNavigator, EnumViews.splash);
+      }
+      expect(blocGame.blocNavigator.currentView, EnumViews.splash);
+    });
+
+    test('actualiza asientos al cambiar el juego', () async {
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      await fakeSession.signInWithGoogle();
+      final List<UserModel?> seatsAntes = List<UserModel?>.from(
+        blocGame.seatsOfPlanningPoker,
+      );
+      await blocGame.createGame(name: 'Nueva Partida');
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      final List<UserModel?> seatsDespues = blocGame.seatsOfPlanningPoker;
+      expect(seatsDespues, isNot(equals(seatsAntes)));
     });
   });
 }

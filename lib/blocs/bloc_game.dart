@@ -55,7 +55,6 @@ class BlocGame {
 
   Future<void> init() async {
     await blocSession.signInWithGoogleUsecase.call();
-    blocNavigator.goTo(EnumViews.createGame);
     // Navegación reactiva según el estado del juego
     _gameBloc.addFunctionToProcessTValueOnStream('navigateOnGameChange', (
       GameModel game,
@@ -80,6 +79,10 @@ class BlocGame {
     blocSession.userStream.listen((UserModel? user) {
       if (user == null) {
         blocNavigator.goTo(EnumViews.splash);
+      } else if (_gameBloc.value.id.isEmpty) {
+        blocNavigator.goTo(EnumViews.createGame);
+      } else {
+        blocNavigator.goTo(EnumViews.centralStage);
       }
     });
   }
