@@ -18,7 +18,8 @@ class GameUtils {
             orElse: () =>
                 const CardModel(id: '', display: '', value: 0, description: ''),
           );
-          return card.value.toDouble();
+          // Solo promedia cartas con value > 0 (numéricas)
+          return (card.value > 0) ? card.value.toDouble() : null;
         })
         .whereType<double>()
         .toList();

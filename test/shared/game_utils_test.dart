@@ -60,5 +60,26 @@ void main() {
       );
       expect(GameUtils.calculateAverage(game), 5.0);
     });
+
+    test('ignores votes with cardId not in deck', () {
+      const CardModel card1 = CardModel(
+        id: '1',
+        display: '1',
+        value: 4,
+        description: 'Four',
+      );
+      // Voto válido y voto inválido (cardId no existe en deck)
+      final List<VoteModel> votes = <VoteModel>[
+        VoteModel(userId: 'user1', cardId: card1.id),
+        const VoteModel(userId: 'user2', cardId: 'no-existe'),
+      ];
+      final GameModel game = GameModel.empty().copyWith(
+        deck: <CardModel>[card1],
+        votes: votes,
+        votesRevealed: true,
+      );
+      // Solo debe promediar el voto válido (4.0)
+      expect(GameUtils.calculateAverage(game), 4.0);
+    });
   });
 }

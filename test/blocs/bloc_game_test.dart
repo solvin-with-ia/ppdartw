@@ -61,6 +61,191 @@ void main() {
     fakeSession.dispose();
   });
 
+  group('calculateAverage', () {
+    late BlocGame blocGame;
+    late FakeServiceWsDatabase fakeDb;
+    late FakeServiceSession fakeSession;
+    late GameRepository gameRepository;
+    late SessionRepository sessionRepository;
+    late CreateGameUsecase createGameUsecase;
+    late GetGameStreamUsecase getGameStreamUsecase;
+    late BlocSession blocSession;
+
+    Future<void> awaitUntil(
+      bool Function() condition, {
+      Duration timeout = const Duration(seconds: 2),
+    }) async {
+      final DateTime start = DateTime.now();
+      while (!condition()) {
+        if (DateTime.now().difference(start) > timeout) {
+          throw Exception('Timeout esperando condición en el test');
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+    }
+
+    setUp(() async {
+      fakeDb = FakeServiceWsDatabase();
+      fakeSession = FakeServiceSession();
+      gameRepository = GameRepositoryImpl(GameGatewayImpl(fakeDb));
+      sessionRepository = SessionRepositoryImpl(
+        SessionGatewayImpl(fakeSession),
+      );
+      createGameUsecase = CreateGameUsecase(gameRepository);
+      getGameStreamUsecase = GetGameStreamUsecase(gameRepository);
+      blocSession = BlocSession(
+        signInWithGoogleUsecase: SignInWithGoogleUsecase(sessionRepository),
+        signOutUsecase: SignOutUsecase(sessionRepository),
+        getUserStreamUsecase: GetUserStreamUsecase(sessionRepository),
+      );
+      blocGame = BlocGame(
+        blocSession: blocSession,
+        createGameUsecase: createGameUsecase,
+        getGameStreamUsecase: getGameStreamUsecase,
+        blocModal: BlocModal(),
+        blocNavigator: BlocNavigator(blocSession),
+      );
+      // Autenticación previa
+      await fakeSession.signInWithGoogle();
+      await blocGame.createGame(name: 'Partida Average');
+      await awaitUntil(() => blocGame.selectedGame.id.isNotEmpty);
+    });
+
+    test('retorna 0.0 si votesRevealed es false', () {
+      expect(blocGame.calculateAverage(), 0.0);
+    });
+
+    test('retorna 0.0 si no hay votos y votesRevealed es true', () async {
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        votes: <VoteModel>[],
+      );
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: modificado.id,
+        data: modificado.toJson(),
+      );
+      await awaitUntil(() => blocGame.selectedGame.votes.isEmpty);
+      await blocGame.revealVotes();
+      await awaitUntil(() => blocGame.selectedGame.votesRevealed);
+      expect(blocGame.calculateAverage(), 0.0);
+    });
+
+    test('retorna 0.0 si todos los votos son no numéricos', () async {
+      final UserModel user = fakeSession.currentUser!;
+      final List<CardModel> deck = <CardModel>[
+        const CardModel(
+          id: 'x',
+          display: '?',
+          value: -1,
+          description: '',
+        ), // carta especial/no numérica,
+        const CardModel(id: '1', display: '1', value: 1, description: ''),
+      ];
+      final VoteModel vote = VoteModel(userId: user.id, cardId: 'x');
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        deck: deck,
+        votes: <VoteModel>[vote],
+      );
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: modificado.id,
+        data: modificado.toJson(),
+      );
+      await awaitUntil(() => blocGame.selectedGame.votes.length == 1);
+      await blocGame.revealVotes();
+      await awaitUntil(() => blocGame.selectedGame.votesRevealed);
+      expect(blocGame.calculateAverage(), 0.0);
+    });
+
+    test('calcula promedio solo de votos numéricos', () async {
+      final UserModel user = fakeSession.currentUser!;
+      final List<CardModel> deck = <CardModel>[
+        const CardModel(
+          id: 'x',
+          display: '?',
+          value: -1,
+          description: '',
+        ), // carta especial/no numérica,
+        const CardModel(id: '1', display: '1', value: 1, description: ''),
+        const CardModel(id: '2', display: '2', value: 2, description: ''),
+      ];
+      final List<VoteModel> votes = <VoteModel>[
+        VoteModel(userId: user.id, cardId: '1'),
+        const VoteModel(userId: 'otro', cardId: '2'),
+      ];
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        deck: deck,
+        votes: votes,
+      );
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: modificado.id,
+        data: modificado.toJson(),
+      );
+      await awaitUntil(() => blocGame.selectedGame.votes.length == 2);
+      await blocGame.revealVotes();
+      await awaitUntil(() => blocGame.selectedGame.votesRevealed);
+      expect(blocGame.calculateAverage(), closeTo(1.5, 0.0001));
+    });
+
+    test('ignora votos no numéricos', () async {
+      final UserModel user = fakeSession.currentUser!;
+      final List<CardModel> deck = <CardModel>[
+        const CardModel(
+          id: 'x',
+          display: '?',
+          value: -1,
+          description: '',
+        ), // carta especial/no numérica,
+        const CardModel(id: '1', display: '1', value: 1, description: ''),
+        const CardModel(id: '2', display: '2', value: 2, description: ''),
+      ];
+      final List<VoteModel> votes = <VoteModel>[
+        VoteModel(userId: user.id, cardId: '1'),
+        const VoteModel(userId: 'otro', cardId: 'x'),
+        const VoteModel(userId: 'otro2', cardId: '2'),
+      ];
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        deck: deck,
+        votes: votes,
+      );
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: modificado.id,
+        data: modificado.toJson(),
+      );
+      await awaitUntil(() => blocGame.selectedGame.votes.length == 3);
+      await blocGame.revealVotes();
+      await awaitUntil(() => blocGame.selectedGame.votesRevealed);
+      expect(blocGame.calculateAverage(), closeTo(1.5, 0.0001));
+    });
+
+    test('calcula promedio decimal correctamente', () async {
+      final UserModel user = fakeSession.currentUser!;
+      final List<CardModel> deck = <CardModel>[
+        const CardModel(id: '1', display: '1', value: 1, description: ''),
+        const CardModel(id: '3', display: '3', value: 3, description: ''),
+      ];
+      final List<VoteModel> votes = <VoteModel>[
+        VoteModel(userId: user.id, cardId: '1'),
+        const VoteModel(userId: 'otro', cardId: '3'),
+      ];
+      final GameModel modificado = blocGame.selectedGame.copyWith(
+        deck: deck,
+        votes: votes,
+      );
+      await fakeDb.saveDocument(
+        collection: 'games',
+        docId: modificado.id,
+        data: modificado.toJson(),
+      );
+      await awaitUntil(() => blocGame.selectedGame.votes.length == 2);
+      await blocGame.revealVotes();
+      await awaitUntil(() => blocGame.selectedGame.votesRevealed);
+      expect(blocGame.calculateAverage(), closeTo(2.0, 0.0001));
+    });
+  });
+
   group('setName', () {
     test('actualiza el nombre correctamente', () {
       blocGame.setName('Test Game');
