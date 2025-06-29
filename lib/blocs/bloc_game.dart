@@ -135,15 +135,10 @@ class BlocGame {
 
   /// Actualiza el draft actual (selectedGame) y persiste los cambios en backend.
   Future<void> updateGame() async {
-    final String previousId = _gameBloc.value.id;
     // Persistir cambios (el usecase actúa como save/update)
     await createGameUsecase.call(_gameBloc.value);
     // Actualiza el draft local (no-op, solo para consistencia)
     _gameBloc.value = _gameBloc.value;
-    // Solo resuscribirse si el id cambió
-    if (_gameBloc.value.id != previousId) {
-      _subscribeToGame(_gameBloc.value.id);
-    }
   }
 
   /// Suscribe el bloc al stream de un juego específico y actualiza el estado reactivo.
