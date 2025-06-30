@@ -71,7 +71,21 @@ class CentralStageView extends StatelessWidget {
                             ),
                             const Spacer(),
                             // Mesa completa Planning Poker
-                            PlanningPokerTableWidget(blocGame: blocGame),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: <Widget>[
+                                PlanningPokerTableWidget(blocGame: blocGame),
+                                if (game.votes.isNotEmpty)
+                                  ButtonWidget(
+                                    label: game.votesRevealed
+                                        ? 'Nueva votación'
+                                        : 'Revelar votos',
+                                    onTap: game.votesRevealed
+                                        ? blocGame.resetRound
+                                        : blocGame.revealVotes,
+                                  ),
+                              ],
+                            ),
                             const Spacer(),
                             // Cartas disponibles
                             if (game.deck.isNotEmpty)
