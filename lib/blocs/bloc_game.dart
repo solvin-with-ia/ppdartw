@@ -114,7 +114,7 @@ class BlocGame {
       deck: defaultPlanningPokerDeck,
     );
     await createGameUsecase.call(game);
-    _subscribeToGame(game.id);
+    subscribeToGame(game.id);
     // Actualiza el draft reactivo tras crear
     _gameBloc.value = game;
   }
@@ -128,7 +128,7 @@ class BlocGame {
   }
 
   /// Suscribe el bloc al stream de un juego específico y actualiza el estado reactivo.
-  void _subscribeToGame(String gameId) {
+  void subscribeToGame(String gameId) {
     _gameSubscription?.cancel();
     _gameSubscription = getGameStreamUsecase(gameId).listen((
       Either<ErrorItem, GameModel?> either,
