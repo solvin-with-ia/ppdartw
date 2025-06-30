@@ -1,3 +1,11 @@
+## 0.23.0 - 2025-06-30
+
+### Minor
+- Visualización final de cartas reveladas en la mesa de juego (PlanningPokerTableWidget) tras revelar votos.
+- Nuevo VotesDeckWidget: muestra desglose de votos por carta y promedio dinámico al final de cada ronda.
+- Experiencia visual alineada al Figma para la fase de cierre y análisis de ronda.
+- Refactor y robustez en la lógica de widgets de cartas y mesa.
+
 ## 0.22.0 - 2025-06-30
 
 ### Minor

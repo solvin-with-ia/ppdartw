@@ -9,6 +9,7 @@ import '../ui/widgets/deck_widget.dart';
 import '../ui/widgets/logo_horizontal_widget.dart';
 import '../ui/widgets/planning_poker_table_widget.dart';
 import '../ui/widgets/user_square_widget.dart';
+import '../ui/widgets/votes_deck_widget.dart';
 
 class CentralStageView extends StatelessWidget {
   const CentralStageView({
@@ -89,7 +90,10 @@ class CentralStageView extends StatelessWidget {
                             const Spacer(),
                             // Cartas disponibles
                             if (game.deck.isNotEmpty)
-                              DeckWidget(blocGame: blocGame),
+                              if (game.deck.isNotEmpty && !game.votesRevealed)
+                                DeckWidget(blocGame: blocGame),
+                              if (game.votesRevealed)
+                                VotesDeckWidget(blocGame: blocGame),
                           ],
                         ),
                       ),

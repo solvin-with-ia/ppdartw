@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jocaagura_domain/jocaagura_domain.dart';
 import '../../blocs/bloc_game.dart';
+import '../../domain/models/card_model.dart';
 import '../../domain/models/game_model.dart';
 import '../../domain/models/vote_model.dart';
 import 'play_card_model_widget.dart';
@@ -56,6 +57,29 @@ class PlanningPokerTableWidget extends StatelessWidget {
                         user: user,
                         isSpectator: isSpectator(user, game),
                         selected: hasVoted(user),
+                        revealedValue:
+                            (game.votesRevealed &&
+                                !isSpectator(user, game) &&
+                                hasVoted(user))
+                            ? (game.deck
+                                  .firstWhere(
+                                    (CardModel c) =>
+                                        c.id ==
+                                        votes
+                                            .firstWhere(
+                                              (VoteModel v) =>
+                                                  v.userId == user.id,
+                                            )
+                                            .cardId,
+                                    orElse: () => const CardModel(
+                                      id: '',
+                                      value: 0,
+                                      display: '',
+                                      description: '',
+                                    ),
+                                  )
+                                  .display)
+                            : null,
                       );
               }),
             ),
@@ -75,6 +99,29 @@ class PlanningPokerTableWidget extends StatelessWidget {
                         user: user,
                         isSpectator: isSpectator(user, game),
                         selected: hasVoted(user),
+                        revealedValue:
+                            (game.votesRevealed &&
+                                !isSpectator(user, game) &&
+                                hasVoted(user))
+                            ? (game.deck
+                                  .firstWhere(
+                                    (CardModel c) =>
+                                        c.id ==
+                                        votes
+                                            .firstWhere(
+                                              (VoteModel v) =>
+                                                  v.userId == user.id,
+                                            )
+                                            .cardId,
+                                    orElse: () => const CardModel(
+                                      id: '',
+                                      value: 0,
+                                      display: '',
+                                      description: '',
+                                    ),
+                                  )
+                                  .display)
+                            : null,
                       );
               }),
             ),
