@@ -1,3 +1,12 @@
+## 0.22.0 - 2025-06-30
+
+### Minor
+- Ampliación exhaustiva de la suite de tests unitarios y E2E:
+  - Cobertura completa de flujos de Planning Poker para roles de jugador, admin y espectador.
+  - Test E2E para edición de nombre de partida y propagación reactiva del cambio.
+  - Validación de reglas UX: asientos, votos, restricciones de nombres (<3 caracteres), cambios de rol y sincronización multiusuario.
+  - Robustez y confiabilidad en escenarios previos a la finalización de partida.
+
 ## 0.21.0 - 2025-06-26
 
 ### Minor

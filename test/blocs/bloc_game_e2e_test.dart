@@ -555,5 +555,50 @@ void main() {
         );
       },
     );
+
+    test(
+      'El admin edita el nombre de la partida y se propaga correctamente',
+      () async {
+        // 1. Crear partida como admin
+        await blocGame.createGame(name: 'Partida Original');
+        final String nombreOriginal = blocGame.selectedGame.name;
+        expect(nombreOriginal, 'Partida Original');
+
+        // 2. Cambiar el nombre a uno válido (>3 caracteres)
+        const String nuevoNombre = 'Nueva Partida';
+        blocGame.setName(nuevoNombre);
+        await blocGame.updateGame();
+
+        // 3. Espera activa a que el cambio se propague al modelo reactivo
+        final DateTime start = DateTime.now();
+        while (blocGame.selectedGame.name != nuevoNombre) {
+          if (DateTime.now().difference(start) > const Duration(seconds: 2)) {
+            fail('Timeout esperando que el nombre de la partida se actualice');
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+        expect(blocGame.selectedGame.name, nuevoNombre);
+
+        // 4. Validar que no se puede poner un nombre inválido (<3 caracteres)
+        blocGame.setName('ab');
+        expect(blocGame.isNameValid, isFalse);
+
+        // 5. Cambiar a un nombre válido nuevamente
+        blocGame.setName('Poker');
+        expect(blocGame.isNameValid, isTrue);
+        await blocGame.updateGame();
+
+        // 6. Espera activa y validación final
+        while (blocGame.selectedGame.name != 'Poker') {
+          if (DateTime.now().difference(start) > const Duration(seconds: 2)) {
+            fail(
+              'Timeout esperando que el nombre de la partida se actualice a Poker',
+            );
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+        expect(blocGame.selectedGame.name, 'Poker');
+      },
+    );
   });
 }
