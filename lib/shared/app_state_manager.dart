@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../blocs/bloc_game.dart';
+import '../blocs/bloc_games.dart';
 import '../blocs/bloc_loading.dart';
 import '../blocs/bloc_modal.dart';
 import '../blocs/bloc_navigator.dart';
@@ -16,12 +17,14 @@ class AppStateManager extends InheritedWidget {
     required this.blocLoading,
     required super.child,
     this.blocModal,
+    this.blocGames,
     super.key,
   });
   final BlocModal? blocModal;
   final BlocTheme blocTheme;
   final BlocSession blocSession;
   final BlocGame blocGame;
+  final BlocGames? blocGames;
   final BlocNavigator blocNavigator;
   final BlocLoading blocLoading;
 

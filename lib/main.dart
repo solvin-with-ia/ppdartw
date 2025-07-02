@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'blocs/bloc_game.dart';
+import 'blocs/bloc_games.dart';
 import 'blocs/bloc_loading.dart';
 import 'blocs/bloc_modal.dart';
 import 'blocs/bloc_navigator.dart';
@@ -12,6 +13,7 @@ import 'domain/services/service_session.dart';
 import 'domain/services/service_ws_database.dart';
 import 'domain/usecases/game/create_game_usecase.dart';
 import 'domain/usecases/game/get_game_stream_usecase.dart';
+import 'domain/usecases/game/get_games_stream_usecase.dart';
 import 'domain/usecases/session/get_user_stream_usecase.dart';
 // Importa los usecases de sesión y juego
 import 'domain/usecases/session/sign_in_with_google_usecase.dart';
@@ -68,6 +70,14 @@ void main() {
     blocNavigator: blocNavigator,
   );
 
+  final GetGamesStreamUsecase getGamesStreamUsecase = GetGamesStreamUsecase(
+    gameRepository,
+  );
+  final BlocGames blocGames = BlocGames(
+    getGamesStreamUsecase: getGamesStreamUsecase,
+    blocGame: blocGame,
+  );
+
   final BlocLoading blocLoading = BlocLoading();
 
   runApp(
@@ -75,6 +85,7 @@ void main() {
       blocTheme: blocTheme,
       blocSession: blocSession,
       blocGame: blocGame,
+      blocGames: blocGames,
       blocNavigator: blocNavigator,
       blocLoading: blocLoading,
       blocModal: blocModal,

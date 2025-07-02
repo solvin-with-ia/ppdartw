@@ -85,6 +85,25 @@ class FakeServiceWsDatabase implements ServiceWsDatabase {
     return bloc.stream;
   }
 
+  Future<void> deleteDocument({
+    required String collection,
+    required String docId,
+  }) async {
+    // Elimina del mapa en memoria
+    final Map<String, Map<String, dynamic>>? docs = _collections[collection];
+    if (docs != null && docs.containsKey(docId)) {
+      docs.remove(docId);
+      // Notifica a los listeners del documento
+      if (_docBlocs[collection]?.containsKey(docId) ?? false) {
+        _docBlocs[collection]![docId]!.value = null;
+      }
+      // Notifica a los listeners de la colección
+      if (_collectionBlocs.containsKey(collection)) {
+        _collectionBlocs[collection]?.value = docs.values.toList();
+      }
+    }
+  }
+
   void dispose() {
     // 1. Limpia _collections
     _collections.clear();
