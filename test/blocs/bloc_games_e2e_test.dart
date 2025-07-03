@@ -74,7 +74,8 @@ void main() {
     test('Simula llegada de jugadores y refleja en BlocGames', () async {
       await MultiPlayerSimulationUtil.simulateNewPlayers(fakeDb, gameId, 4);
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      final List<GameModel> juegos = blocGames.games.value;
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      final List<GameModel> juegos = blocGames.games;
       expect(juegos.any((GameModel g) => g.id == gameId), isTrue);
       final GameModel game = juegos.firstWhere((GameModel g) => g.id == gameId);
       expect(game.players.length, 4);
@@ -88,7 +89,8 @@ void main() {
         const Duration(milliseconds: 10),
       );
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      final List<GameModel> juegos = blocGames.games.value;
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      final List<GameModel> juegos = blocGames.games;
       expect(juegos.any((GameModel g) => g.id == gameId), isTrue);
       final GameModel game = juegos.firstWhere((GameModel g) => g.id == gameId);
       expect(game.spectators.length, 2); // Admin no es espectador
@@ -97,7 +99,8 @@ void main() {
     test('Simula votos aleatorios y refleja en BlocGames', () async {
       await MultiPlayerSimulationUtil.simulateNewPlayers(fakeDb, gameId, 4);
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      final List<GameModel> juegos = blocGames.games.value;
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      final List<GameModel> juegos = blocGames.games;
       final GameModel game = juegos.firstWhere((GameModel g) => g.id == gameId);
       final UserModel currentUser = game.players.first;
       await MultiPlayerSimulationUtil.randomVotes(
@@ -107,7 +110,7 @@ void main() {
         const Duration(milliseconds: 10),
       );
       await Future<void>.delayed(const Duration(milliseconds: 100));
-      final GameModel updated = blocGames.games.value.firstWhere(
+      final GameModel updated = blocGames.games.firstWhere(
         (GameModel g) => g.id == gameId,
       );
       expect(updated.votes.length, updated.players.length - 1);
@@ -132,7 +135,8 @@ void main() {
           3,
         );
         await Future<void>.delayed(const Duration(milliseconds: 100));
-        final List<GameModel> juegos = blocGames.games.value;
+        await Future<void>.delayed(const Duration(milliseconds: 40));
+        final List<GameModel> juegos = blocGames.games;
         final GameModel game = juegos.firstWhere(
           (GameModel g) => g.id == gameId,
         );
@@ -144,7 +148,7 @@ void main() {
           const Duration(milliseconds: 10),
         );
         await Future<void>.delayed(const Duration(milliseconds: 100));
-        final GameModel updated = blocGames.games.value.firstWhere(
+        final GameModel updated = blocGames.games.firstWhere(
           (GameModel g) => g.id == gameId,
         );
         expect(updated.players.length, 1);
@@ -168,7 +172,8 @@ void main() {
           const Duration(milliseconds: 10),
         );
         await Future<void>.delayed(const Duration(milliseconds: 100));
-        final List<GameModel> juegos = blocGames.games.value;
+        await Future<void>.delayed(const Duration(milliseconds: 40));
+        final List<GameModel> juegos = blocGames.games;
         final GameModel game = juegos.firstWhere(
           (GameModel g) => g.id == gameId,
         );
@@ -186,7 +191,7 @@ void main() {
           const Duration(milliseconds: 10),
         );
         await Future<void>.delayed(const Duration(milliseconds: 100));
-        final GameModel updated = blocGames.games.value.firstWhere(
+        final GameModel updated = blocGames.games.firstWhere(
           (GameModel g) => g.id == gameId,
         );
         expect(updated.players.length, 1);

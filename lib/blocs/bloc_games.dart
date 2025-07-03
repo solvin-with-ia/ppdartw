@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:jocaagura_domain/jocaagura_domain.dart';
-import '../domain/models/game_model.dart';
-import '../domain/usecases/game/get_games_stream_usecase.dart';
-import 'bloc_game.dart';
 
 /// BlocGames: Administra la lista de juegos activos y la selección de un juego.
+import 'package:flutter/material.dart';
+import 'package:jocaagura_domain/jocaagura_domain.dart';
+
+import '../domain/models/game_model.dart';
+import '../domain/usecases/game/get_games_stream_usecase.dart';
+import '../ui/modals/games_list_modal.dart';
+import 'bloc_game.dart';
+
 class BlocGames {
   BlocGames({required this.getGamesStreamUsecase, required this.blocGame}) {
     _subscribeToGames();
@@ -15,15 +19,15 @@ class BlocGames {
   final GetGamesStreamUsecase getGamesStreamUsecase;
   final BlocGame blocGame;
 
-  // Stream de todos los juegos activos
-  final ValueNotifier<List<GameModel>> games = ValueNotifier<List<GameModel>>(
+  final BlocGeneral<List<GameModel>> _gamesBloc = BlocGeneral<List<GameModel>>(
     <GameModel>[],
   );
 
-  // Juego seleccionado (puede ser null)
-  final ValueNotifier<GameModel?> selectedGame = ValueNotifier<GameModel?>(
-    null,
-  );
+  /// Devuelve el juego seleccionado actual (GameModel.empty() si ninguno)
+  GameModel get selectedGame => blocGame.selectedGame;
+
+  Stream<List<GameModel>> get gamesStream => _gamesBloc.stream;
+  List<GameModel> get games => _gamesBloc.value;
 
   StreamSubscription<Either<ErrorItem, List<GameModel>>>? _gamesSubscription;
 
@@ -41,11 +45,11 @@ class BlocGames {
           );
         },
         (List<GameModel> gamesList) {
-          games.value = gamesList;
+          _gamesBloc.value = gamesList;
           // Si el juego seleccionado ya no existe, lo deselecciona
-          if (selectedGame.value != null &&
-              !gamesList.any((GameModel g) => g.id == selectedGame.value!.id)) {
-            selectedGame.value = null;
+          if (selectedGame.id.isNotEmpty &&
+              !gamesList.any((GameModel g) => g.id == selectedGame.id)) {
+            blocGame.subscribeToGame('none');
           }
         },
       );
@@ -54,21 +58,33 @@ class BlocGames {
 
   /// Selecciona un juego por ID y actualiza BlocGame
   void selectGame(String gameId) {
-    final GameModel game = games.value.firstWhere(
+    final GameModel game = games.firstWhere(
       (GameModel g) => g.id == gameId,
       orElse: () => GameModel.empty(),
     );
     if (game.id.isEmpty) {
       return;
     }
-    selectedGame.value = game;
     blocGame.subscribeToGame(gameId);
+  }
+
+  /// Muestra el modal de selección de partida
+  void showGamesModal() {
+    blocGame.blocModal.showModal(
+      GamesListModal(
+        games: games,
+        onSelect: (GameModel game) {
+          selectGame(game.id);
+          blocGame.blocModal.hideModal();
+        },
+        onCancel: () => blocGame.blocModal.hideModal(),
+      ),
+    );
   }
 
   /// Limpieza de recursos
   void dispose() {
     _gamesSubscription?.cancel();
-    games.dispose();
-    selectedGame.dispose();
+    _gamesBloc.dispose();
   }
 }

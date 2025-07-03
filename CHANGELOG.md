@@ -1,3 +1,12 @@
+## 0.25.0 - 2025-07-03
+
+### Minor
+- Modal de selección de juego completamente reactivo e integrado con BlocGames y BlocGame.
+- Refactor de tests unitarios y E2E para comprobar la reactividad real del sistema (FakeServiceWsDatabase, BlocGames, BlocGame).
+- Corrección de bug: deselección automática del juego cuando desaparece del backend.
+- Robustez en la propagación de streams y sincronización multi-bloc.
+- Cobertura de tests 100% verde y robusta para flujos de selección y eliminación de juegos.
+
 ## 0.24.0 - 2025-07-03
 
 ### Minor

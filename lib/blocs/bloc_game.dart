@@ -130,6 +130,10 @@ class BlocGame {
   /// Suscribe el bloc al stream de un juego específico y actualiza el estado reactivo.
   void subscribeToGame(String gameId) {
     _gameSubscription?.cancel();
+    if (gameId == 'none' || gameId.isEmpty) {
+      _gameBloc.value = GameModel.empty();
+      return;
+    }
     _gameSubscription = getGameStreamUsecase(gameId).listen((
       Either<ErrorItem, GameModel?> either,
     ) {
