@@ -1,3 +1,11 @@
+## 0.24.0 - 2025-07-03
+
+### Minor
+- Simulación multiusuario optimizada y configurable (`MultiPlayerSimulationUtil`)
+- Tests E2E reactivos y rápidos para escenarios multi-juego y multiusuario usando `BlocGames`
+- Cobertura de test mejorada y delays personalizables para pruebas rápidas
+- Refactor menor en utilidades de simulación para flexibilidad y robustez
+
 ## 0.23.0 - 2025-06-30
 
 ### Minor
